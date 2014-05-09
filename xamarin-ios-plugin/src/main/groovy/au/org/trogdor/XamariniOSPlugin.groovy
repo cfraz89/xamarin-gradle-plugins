@@ -12,7 +12,9 @@ class XamariniOSPlugin implements Plugin<Project> {
 		project.extensions.create("xamariniOS", XamarinIOSProjectExtension)
 		project.afterEvaluate({
 			project.xamariniOS.configurations.each() {conf->
-		    	project.task("xamariniOSBuild-${conf}", description: "Build a Xamarin iOS app using configuration ${conf}", group: "Xamarin", type: MDToolCompileTask) {
+				def taskName = conf.replaceAll(~/\|/, "")
+				println taskName
+		    	project.task("xamariniOSBuild-${taskName}", description: "Build a Xamarin iOS app using configuration ${conf}", group: "Xamarin", type: MDToolCompileTask) {
 		    		mdtoolPath = project.xamariniOS.mdtoolPath
 		    		projectName =  project.xamariniOS.projectName
 		    		solutionFile = project.xamariniOS.solutionFile

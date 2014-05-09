@@ -12,7 +12,8 @@ class XamarinAndroidPlugin implements Plugin<Project> {
 		project.extensions.create("xamarinAndroid", XamarinAndroidProjectExtension)
 		project.afterEvaluate({
 			project.xamarinAndroid.configurations.each() {conf->
-		    	project.task("xamarinAndroidBuild-${conf}", description: "Build a Xamarin Android app using configuration ${conf}", group: "Xamarin", type: XBuildCompileTask) {
+				def taskName = conf.replaceAll(~/\|/, "")
+		    	project.task("xamarinAndroidBuild-${taskName}", description: "Build a Xamarin Android app using configuration ${conf}", group: "Xamarin", type: XBuildCompileTask) {
 		    		xbuildPath = project.xamarinAndroid.xbuildPath
 		    		projectFile =  project.xamarinAndroid.projectFile
 		    		configuration = conf
