@@ -12,13 +12,18 @@ class XamariniOSPlugin implements Plugin<Project> {
 		project.extensions.create("xamariniOS", XamarinIOSProjectExtension)
 		project.afterEvaluate({
 			project.xamariniOS.configurations.each() {conf->
-		    	project.task("xamariniOSBuild-${conf}", description: "Build a Xamarin iOS app using configuration ${conf}", group: "Xamarin", type: MDToolTask) {
+		    	project.task("xamariniOSBuild-${conf}", description: "Build a Xamarin iOS app using configuration ${conf}", group: "Xamarin", type: MDToolCompileTask) {
 		    		mdtoolPath = project.xamariniOS.mdtoolPath
 		    		projectName =  project.xamariniOS.projectName
 		    		solutionFile = project.xamariniOS.solutionFile
 		    		configuration = conf
 		    	}
 		    }
+		    project.task("xamariniOSClean", description: "Clean the Xamarin iOS project", group: "Xamarin", type: MDToolCleanTask) {
+		    		mdtoolPath = project.xamariniOS.mdtoolPath
+		    		projectName =  project.xamariniOS.projectName
+		    		solutionFile = project.xamariniOS.solutionFile
+		    	}
     	})
     }
 }
@@ -36,13 +41,28 @@ class MDToolTask extends DefaultTask {
 	def solutionFile
 	def configuration
 
+	def generateCommand() {
+		return []
+	}
+
 	@TaskAction
 	def build() {
-		def command = [mdtoolPath, 'build', '-t:Build', "-p:${projectName}", "-c:${configuration}" , solutionFile]
-		def proc = command.execute()
+		def proc = generateCommand().execute()
 		proc.in.eachLine { line-> println line}
 		proc.waitFor()
 		if(proc.exitValue())
 			throw new TaskExecutionException(this, null)
+	}
+}
+
+class MDToolCompileTask extends MDToolTask {
+	def generateCommand() {
+		return [mdtoolPath, 'build', '-t:Build', "-p:${projectName}", "-c:${configuration}" , solutionFile]
+	}
+}
+
+class MDToolCleanTask extends MDToolTask {
+	def generateCommand() {
+		return [mdtoolPath, 'build', '-t:Clean', "-p:${projectName}", solutionFile]
 	}
 }
