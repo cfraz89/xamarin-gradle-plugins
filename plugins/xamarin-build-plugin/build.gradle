@@ -1,0 +1,6 @@
+version = 0.1
+ext.artifactId = 'xamarin-build-plugin'
+
+dependencies {
+	compile project(':plugins:xamarin-dependency-plugin')
+}

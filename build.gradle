@@ -1,0 +1,3 @@
+allprojects {
+	group = 'au.org.trogdor.xamarin-gradle-plugins'
+}

@@ -1,0 +1,29 @@
+version = 0.1
+ext.artifactId = 'lib'
+
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+apply plugin: 'maven'
+
+configurations {
+	includeInJar
+}
+
+jar {
+
+}
+
+afterEvaluate {
+	install {
+	    repositories.mavenInstaller {
+	        pom.version = project.version
+	        pom.groupId = project.group
+	        pom.artifactId = project.ext.artifactId
+	    }
+	}
+}
