@@ -1,6 +1,0 @@
-version = 0.1
-ext.artifactId = 'xamarin-ios-plugin'
-
-dependencies {
-	compile project(':plugins:xamarin-dependency-plugin')
-}
