@@ -1,1 +1,1 @@
-include 'plugins:xamarin-build-plugin', 'plugins:xamarin-dependency-plugin', 'lib'
+include 'plugins:xamarin-build-plugin', 'plugins:xamarin-dependency-plugin', 'plugins:xamarin-maven-publish-plugin', 'lib'

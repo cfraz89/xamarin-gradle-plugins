@@ -1,13 +1,12 @@
 package au.org.trogdor.xamarin.tasks
 
-import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.TaskAction	
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskExecutionException
 
 class XBuildTask extends DefaultTask {
 	def xamarinProject
-	def configuration
+	def activeConfiguration
 
 	protected def projectFilePath
 
@@ -28,14 +27,14 @@ class XBuildTask extends DefaultTask {
 
 class XBuildCompileTask extends XBuildTask {
 	def generateCommand() {
-		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration}", '/t:Build']
+		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${activeConfiguration}", '/t:Build']
 	}
 }
 
 
 class XBuildAndroidPackageTask extends XBuildTask {
 	def generateCommand() {
-		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration}", '/t:PackageForAndroid']
+		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${activeConfiguration}", '/t:PackageForAndroid']
 	}
 }
 

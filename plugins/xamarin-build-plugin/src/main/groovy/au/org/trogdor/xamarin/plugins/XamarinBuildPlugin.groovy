@@ -18,7 +18,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
 
 class XamarinBuildExtension {
 	private def Project project
-	private def XamarinProject xamarinProject 
+	def XamarinProject xamarinProject
 
 	def xbuildPath = "xbuild"
 	def mdtoolPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool"

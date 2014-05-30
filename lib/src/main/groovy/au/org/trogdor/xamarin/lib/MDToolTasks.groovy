@@ -1,13 +1,12 @@
 package au.org.trogdor.xamarin.tasks
 
-import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.TaskAction	
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskExecutionException
 
 class MDToolTask extends DefaultTask {
 	def xamarinProject
-	def configuration
+	def activeConfiguration
 
 	protected def solutionFilePath
 
@@ -28,7 +27,7 @@ class MDToolTask extends DefaultTask {
 
 class MDToolCompileTask extends MDToolTask {
 	def generateCommand() {
-		return [project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration}" , solutionFilePath]
+		return [project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${activeConfiguration}" , solutionFilePath]
 	}
 }
 
