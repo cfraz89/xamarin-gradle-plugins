@@ -37,7 +37,15 @@ class XamarinProject implements NamedDomainObjectFactory<Configuration>{
 
 @InheritConstructors
 class XBuildProject extends XamarinProject {
-	def projectFile = ''
+	private String mProjectFile = ''
+
+    def projectFile(String projectFile) {
+        mProjectFile = projectFile
+    }
+
+    def getProjectFile() {
+        return mProjectFile
+    }
 	
 	def buildTask() {
 		return XBuildCompileTask
@@ -57,7 +65,7 @@ class XBuildAndroidProject extends XBuildProject {
 
 @InheritConstructors
 class MDToolProject extends XamarinProject {
-	def mSolutionFile
+	private String mSolutionFile
 
     def solutionFile(String solutionFile) {
         mSolutionFile = solutionFile

@@ -20,8 +20,8 @@ class XamarinBuildExtension {
 	private def Project project
 	def XamarinProject xamarinProject
 
-	def xbuildPath = "xbuild"
-	def mdtoolPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool"
+	private String mXBuildPath = "xbuild"
+	private String mMDToolPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool"
 
 	XamarinBuildExtension(Project prj) {
 		project = prj
@@ -34,6 +34,22 @@ class XamarinBuildExtension {
 		project.configure(xprj, closure)
 		this.xamarinProject = xprj
 	}
+
+    def xbuildPath(String xbuildPath) {
+        mXBuildPath = xbuildPath
+    }
+
+    def getxbuildPath() {
+        return mXBuildPath
+    }
+
+    def mdtoolPath(String mdtoolpath) {
+        mMDToolPath = mdtoolpath
+    }
+
+    def getmdtoolPath() {
+        return mMDToolPath
+    }
 
 	def androidProject(Closure closure) {
 		setProject(new XBuildAndroidProject(project), closure)
