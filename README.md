@@ -15,6 +15,7 @@ The plugins can be installed into the local maven repository with "gradle instal
 
 Applying the plugins
 ------------------------------
+Apply the plugins like such:
 
 `
 buildscript {
@@ -70,8 +71,7 @@ dependencies {
 `
 
 *Tasks:*
-fetchXamarinDependencies
-
+- fetchXamarinDependencies
 
 
 Android Projects
@@ -181,12 +181,12 @@ These are convenience tasks which invoke the corresponding maven publish tasks, 
 xamarinPublish {
 	mavenTask 'Release'
 }
+`
 
 *Tasks:*
 - Standard maven tasks
 - xamarinPublishMaven
 - xamarinPublishMavenLocal
-`
 
 In this example, the dll produced by the Release configuration of the specified project will be published.
 
