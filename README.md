@@ -15,6 +15,7 @@ The plugins can be installed into the local maven repository with "gradle instal
 
 Applying the plugins
 ------------------------------
+`
 buildscript {
     repositories {
         mavenLocal()
@@ -27,6 +28,7 @@ buildscript {
 
 apply plugin: 'xamarin-android-plugin'
 apply plugin: 'xamarin-publish-plugin'
+`
 
 Using the build plugin
 ------------------------------
@@ -44,7 +46,7 @@ The block can optionally be configured with xbuildPath and mdtoolpath.
 These default to 'xbuild' and '/Applications/Xamarin Studio.app/Contents/MacOS/mdtool' respectively, and will suit standard Xamarin installs.
 
 *Example:*
-
+`
 xamarin {
     xbuildPath '/usr/local/bin/xbuild'
     mdtoolPath '/usr/local/bin/mdtool'
@@ -52,6 +54,7 @@ xamarin {
         ...
     }
 }
+`
 
 Dependencies
 ------------------------------
@@ -59,10 +62,11 @@ The 'xamarinCompile' configuration is added by the build plugin. DLL's which hav
 and will be copied into a 'dependencies' (by default) folder with the 'fetchXamarinDependencies' task, which also runs before build steps.
 
 *Example:*
-
+`
 dependencies {
     xamarinCompile 'au.com.sample.group:SampleComponent:1.0'
 }
+`
 
 *Tasks:*
 fetchXamarinDependencies
@@ -72,7 +76,7 @@ fetchXamarinDependencies
 Android Projects
 ------------------------------
 A typical Xamarin Android project will be configured like so:
-
+`
 xamarin {
     androidProject {
         projectName 'Project'
@@ -87,6 +91,7 @@ xamarin {
         }
     }
 }
+`
 
 *Tasks:*
 - xamarinBuild-Debug
@@ -105,7 +110,7 @@ However if the projectName is specified, the output file defaults to 'bin/$confi
 dependencyDir can also be specified, and will define where downloaded dependencies get copied into
 
 *Example configuration with all parameters:*
-
+`
 xamarin {
     androidProject {
         projectFile '../Project.csproj'
@@ -124,6 +129,7 @@ xamarin {
         }
     }
 }
+`
 
 *Tasks:*
 - xamarinBuild-CustomDebugTarget
@@ -136,7 +142,7 @@ xamarin {
 iOS Projects
 --------------------------
 A typical Xamarin iOS project will be configured like so:
-
+`
 xamarin {
     iOSProject {
         projectName 'Project'
@@ -152,6 +158,7 @@ xamarin {
         }
     }
 }
+`
 
 *Tasks:*
 - xamarinBuild-Debug
@@ -169,7 +176,7 @@ This will add the typical maven publishing tasks, as well as two more - xamarinP
 These are convenience tasks which invoke the corresponding maven publish tasks, however also have a dependency on the build step of the selected configuration.
 
 *Typical configuration:*
-
+`
 xamarinPublish {
 	mavenTask 'Release'
 }
@@ -178,12 +185,14 @@ xamarinPublish {
 - Standard maven tasks
 - xamarinPublishMaven
 - xamarinPublishMavenLocal
+`
 
 In this example, the dll produced by the Release configuration of the specified project will be published.
 
 *Custom artifactId:*
-
+`
 xamarinPublish {
 	mavenTask 'Release'
 	artifactId 'CustomArtifact'
 }
+`
