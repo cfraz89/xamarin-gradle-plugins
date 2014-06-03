@@ -14,7 +14,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="xamarin-dependency-plugin" exported="" />
     <orderEntry type="module" module-name="lib" exported="" />
     <orderEntry type="library" exported="" name="Gradle: gradle-core-1.11" level="project" />
     <orderEntry type="library" exported="" name="Gradle: groovy-all-1.8.6" level="project" />

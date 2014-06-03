@@ -6,7 +6,7 @@ import org.gradle.api.tasks.TaskExecutionException
 
 class XBuildTask extends DefaultTask {
 	XamarinProject xamarinProject
-	Configuration configuration
+	XamarinConfiguration configuration
 
 	protected def projectFilePath
 

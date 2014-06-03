@@ -5,17 +5,18 @@ import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.Project
 import groovy.transform.InheritConstructors
 
-class XamarinProject implements NamedDomainObjectFactory<Configuration>{
+class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 	final Project project
-    final NamedDomainObjectCollection<Configuration> configurationContainer
+    final NamedDomainObjectCollection<XamarinConfiguration> configurationContainer
     private String mProjectName
+    private String mDepDir = "dependencies"
 
 	XamarinProject(Project prj) {
         this.project = prj
         prj.task("xamarinClean", description: "Clean the Xamarin project", group: "Xamarin", type: cleanTask()) {
             xamarinProject = this
         }
-        configurationContainer = prj.container(Configuration, this)
+        configurationContainer = prj.container(XamarinConfiguration, this)
     }
 
     def projectName(String name) {
@@ -26,12 +27,20 @@ class XamarinProject implements NamedDomainObjectFactory<Configuration>{
         return mProjectName;
     }
 
-    Configuration create(String name) {
-        return new Configuration(name, project, this)
+    XamarinConfiguration create(String name) {
+        return new XamarinConfiguration(name, project, this)
     }
 
     def configurations(Closure closure) {
         configurationContainer.configure(closure)
+    }
+
+    def dependencyDir(String depDir) {
+        mDepDir = depDir
+    }
+
+    String getDependencyDir() {
+        mDepDir
     }
 }
 
@@ -58,7 +67,7 @@ class XBuildProject extends XamarinProject {
 
 @InheritConstructors
 class XBuildAndroidProject extends XBuildProject {
-    Configuration create(String name) {
+    XamarinConfiguration create(String name) {
         return new AndroidConfiguration(name, project, this)
     }
 }

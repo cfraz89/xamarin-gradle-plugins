@@ -7,13 +7,13 @@ import org.gradle.api.Task
 /**
  * Created by chrisfraser on 30/05/2014.
  */
-class Configuration {
+class XamarinConfiguration {
     final String name
     final Project project
     final XamarinProject xPrj
     private String buildOutput
 
-    def Configuration(String name, Project project, XamarinProject xamarinProject) {
+    def XamarinConfiguration(String name, Project project, XamarinProject xamarinProject) {
         this.name = name
         this.project = project
         this.xPrj = xamarinProject
@@ -47,7 +47,7 @@ class Configuration {
 }
 
 @InheritConstructors
-class AndroidConfiguration extends Configuration {
+class AndroidConfiguration extends XamarinConfiguration {
     private String packageOutput
 
     def androidPackage(String output) {
