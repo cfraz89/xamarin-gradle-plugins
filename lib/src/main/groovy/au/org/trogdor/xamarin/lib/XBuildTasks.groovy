@@ -1,12 +1,12 @@
-package au.org.trogdor.xamarin.tasks
+package au.org.trogdor.xamarin.lib
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskExecutionException
 
 class XBuildTask extends DefaultTask {
-	def xamarinProject
-	def activeConfiguration
+	XamarinProject xamarinProject
+	Configuration configuration
 
 	protected def projectFilePath
 
@@ -14,9 +14,16 @@ class XBuildTask extends DefaultTask {
 		return []
 	}
 
+    def generateProjectFilePath() {
+        def unresolvedPath = xamarinProject.projectFile
+        if (xamarinProject.getProjectName() && !unresolvedPath)
+            unresolvedPath = xamarinProject.getProjectName() + ".csproj"
+        project.file(unresolvedPath).path
+    }
+
 	@TaskAction
-	def build() {
-		projectFilePath = project.file(xamarinProject.projectFile).path
+	def executeTask() {
+		projectFilePath = generateProjectFilePath()
 		def proc = generateCommand().execute()
 		proc.in.eachLine { line-> println line}
 		proc.waitFor()
@@ -27,19 +34,19 @@ class XBuildTask extends DefaultTask {
 
 class XBuildCompileTask extends XBuildTask {
 	def generateCommand() {
-		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${activeConfiguration}", '/t:Build']
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration.name}", '/t:Build']
 	}
 }
 
 
 class XBuildAndroidPackageTask extends XBuildTask {
 	def generateCommand() {
-		def command = [project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${activeConfiguration}", '/t:PackageForAndroid']
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration.name}", '/t:PackageForAndroid']
 	}
 }
 
 class XBuildCleanTask extends XBuildTask {
 	def generateCommand() {
-		def command = [project.xamarin.xbuildPath, projectFilePath,  '/t:Clean']
+		[project.xamarin.xbuildPath, projectFilePath,  '/t:Clean']
 	}
 }
