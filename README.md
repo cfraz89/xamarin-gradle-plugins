@@ -15,6 +15,7 @@ The plugins can be installed into the local maven repository with "gradle instal
 
 Applying the plugins
 ------------------------------
+
 `
 buildscript {
     repositories {
@@ -196,3 +197,4 @@ xamarinPublish {
 	artifactId 'CustomArtifact'
 }
 `
+
