@@ -25,10 +25,8 @@ class DependencyFetchTask extends DefaultTask {
     @TaskAction
     def fetch() {
         mConfiguration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
-            println project.file(artifact.file)
-            println project.file(libDir)
             project.copy {
-                from project.file(artifact.file)
+                from artifact.file
                 into (libDir)
                 rename { "${artifact.name}.${artifact.extension}" }
             }
