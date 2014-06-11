@@ -14,10 +14,11 @@ class XamarinBuildPlugin implements Plugin<Project> {
 		project.extensions.create("xamarin", XamarinBuildExtension, project)
 
         project.afterEvaluate() {
-            def fetchTask = project.task("fetchXamarinDependencies", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-                libDir = project.xamarin.xamarinProject.dependencyDir
-                configuration = project.configurations.xamarinCompile
-            }
+            if (project.xamarin.xamarinProject)
+                project.task("fetchXamarinDependencies", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+                    libDir = project.xamarin.xamarinProject.dependencyDir
+                    configuration = project.configurations.xamarinCompile
+                }
         }
     }
 }

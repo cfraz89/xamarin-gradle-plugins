@@ -6,8 +6,6 @@ import org.gradle.api.tasks.TaskExecutionException
 
 class MDToolTask extends DefaultTask {
 	XamarinProject xamarinProject
-	XamarinConfiguration configuration
-
 	protected def solutionFilePath
 
 	def generateCommand() {
@@ -18,21 +16,38 @@ class MDToolTask extends DefaultTask {
 	def build() {
 		solutionFilePath = project.file(xamarinProject.solutionFile).path
 		def proc = generateCommand().execute()
-		proc.in.eachLine { line-> println line}
-		proc.waitFor()
+		def serr = new ByteArrayOutputStream(4096)
+		proc.waitForProcessOutput(System.out, serr)
+
 		if(proc.exitValue())
 			throw new TaskExecutionException(this, null)
 	}
 }
 
 class MDToolCompileTask extends MDToolTask {
+    XamarinConfiguration configuration
+
 	def generateCommand() {
-		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration.name}" , solutionFilePath]
+		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
 	}
 }
 
 class MDToolCleanTask extends MDToolTask {
-	def generateCommand() {
-		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.projectName}", solutionFilePath]
+    @TaskAction
+    def build() {
+        def serr = new ByteArrayOutputStream(4096)
+
+        solutionFilePath = project.file(xamarinProject.solutionFile).path
+        xamarinProject.configurationContainer.all() { configuration ->
+            def proc = generateCommand(configuration).execute()
+            proc.waitForProcessOutput(System.out, serr)
+
+            if (proc.exitValue())
+                throw new TaskExecutionException(this, null)
+        }
+    }
+
+	def generateCommand(XamarinConfiguration configuration) {
+		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
 	}
 }

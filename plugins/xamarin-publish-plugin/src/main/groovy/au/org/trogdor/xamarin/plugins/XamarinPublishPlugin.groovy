@@ -14,6 +14,7 @@ class XamarinPublishPlugin implements Plugin<Project> {
 class XamarinPublishExtension {
     final def Project project
     private def String mArtifactId
+    private def String mRepository
 
     XamarinPublishExtension(Project project) {
         this.project = project
@@ -25,6 +26,14 @@ class XamarinPublishExtension {
 
     String getArtifactId() {
         mArtifactId
+    }
+
+    void repository(String repo) {
+        mRepository = repo
+    }
+
+    String getRepository() {
+        mRepository
     }
 
     void mavenTask(String configuration) {
@@ -47,7 +56,7 @@ class XamarinPublishExtension {
                 }
             }
         }
-
+        /*
         def taskName = configuration.replaceAll(~/\|/, "")
         def buildTaskName = "xamarinBuild-$taskName"
         def buildTask = project.tasks.findByName(buildTaskName)
@@ -56,5 +65,6 @@ class XamarinPublishExtension {
         project.tasks.findByName('publish').mustRunAfter(buildTask)
         project.task('xamarinPublishMavenLocal', description: "Publish the Xamarin component using configuration $configuration to the local Maven repository", group: 'Xamarin', dependsOn: [buildTaskName, 'publishToMavenLocal'])
         project.task('xamarinPublishMaven', description: "Publish the Xamarin component using configuration $configuration to Maven", group: 'Xamarin', dependsOn: [buildTaskName, 'publish'])
+        */
     }
 }
