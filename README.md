@@ -70,6 +70,16 @@ dependencies {
 }
 ```
 
+Debug symbols (.dll.mdb) get pushed to maven under the debug-symbols classifier, and can also be specified to allow debugging assemblies.
+
+*Example:*
+```groovy
+dependencies {
+    xamarinCompile 'au.com.sample.group:SampleComponent:1.0'
+    xamarinCompile 'au.com.sample.group:SampleComponent:1.0:debug-symbols@dll.mdb'
+}
+```
+
 *Tasks:*
 - fetchXamarinDependencies
 
@@ -173,8 +183,8 @@ Using the publishing plugin
 ---------------------------
 The publishing plugin leverages the maven-publish plugin, adding a maven publishing configuration for a specified configuration's build() target.
 Under this maven configuration, the output dll will be added as an artifact, with artifactId equal to to the projectName by default, and other parameters (group, version) pulled from the project properties.
-This will add the typical maven publishing tasks, as well as two more - xamarinPublishMaven and xamarinPublishMavenLocal.
-These are convenience tasks which invoke the corresponding maven publish tasks, however also have a dependency on the build step of the selected configuration.
+If the mdb debug file exists in the specified configuration, it will be published with the 'debug-symbols' classifier. 
+This will add the typical maven publishing tasks.
 
 *Typical configuration:*
 ```groovy
@@ -185,8 +195,6 @@ xamarinPublish {
 
 *Tasks:*
 - Standard maven tasks
-- xamarinPublishMaven
-- xamarinPublishMavenLocal
 
 In this example, the dll produced by the Release configuration of the specified project will be published.
 
