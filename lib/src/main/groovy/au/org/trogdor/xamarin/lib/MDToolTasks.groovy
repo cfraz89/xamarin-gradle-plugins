@@ -28,7 +28,9 @@ class MDToolCompileTask extends MDToolTask {
     XamarinConfiguration configuration
 
 	def generateCommand() {
-		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
+		def cmd = [project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
+        println cmd
+        return cmd
 	}
 }
 

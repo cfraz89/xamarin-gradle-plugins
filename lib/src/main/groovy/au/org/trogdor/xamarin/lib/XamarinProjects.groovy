@@ -27,12 +27,27 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
         return mProjectName;
     }
 
+    protected def makeConfiguration(String name) {
+        def config = project.configurations.create("xamarinCompile-$name") {
+            extendsFrom project.configurations.xamarinCompile
+        }
+        project.task("fetchXamarinDependencies-$name", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+            xamarinProject = this
+            configuration = config
+        }
+    }
+
     XamarinConfiguration create(String name) {
+        makeConfiguration(name)
         return new XamarinConfiguration(name, project, this)
     }
 
     def configurations(Closure closure) {
         configurationContainer.configure(closure)
+    }
+
+    def getConfigurations() {
+        configurationContainer
     }
 
     def dependencyDir(String depDir) {
@@ -68,6 +83,7 @@ class XBuildProject extends XamarinProject {
 @InheritConstructors
 class XBuildAndroidProject extends XBuildProject {
     XamarinConfiguration create(String name) {
+        makeConfiguration(name)
         return new AndroidConfiguration(name, project, this)
     }
 }

@@ -29,16 +29,16 @@ class XamarinConfiguration {
         return output
     }
 
-    protected def getTaskName() {
-        name.replaceAll(~/\|/, "")
-    }
+    //protected def getTaskName() {
+    //    name.replaceAll(~/\|/, "")
+    //}
 
-    def build(String name) {
-        def task = project.task("xamarinBuild-${taskName}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies", type: xPrj.buildTask()) {
+    def build(String outFile) {
+        def task = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
         }
-        buildOutput = setTaskOutput(task, name)
+        buildOutput = setTaskOutput(task, outFile)
     }
 
     def getBuildOutput() {
@@ -50,12 +50,12 @@ class XamarinConfiguration {
 class AndroidConfiguration extends XamarinConfiguration {
     private String packageOutput
 
-    def androidPackage(String output) {
-        def task = project.task("xamarinPackage-${taskName}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies", type: XBuildAndroidPackageTask) {
+    def androidPackage(String outFile) {
+        def task = project.task("xamarinPackage-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: XBuildAndroidPackageTask) {
             xamarinProject = xPrj
             configuration = this
         }
-        packageOutput = setTaskOutput(task, output)
+        packageOutput = setTaskOutput(task, outFile)
     }
 
     def getPackageOutput() {

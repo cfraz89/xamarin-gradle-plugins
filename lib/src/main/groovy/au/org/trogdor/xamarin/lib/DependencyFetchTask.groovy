@@ -9,27 +9,35 @@ import org.gradle.api.artifacts.Configuration
  * Created by chrisfraser on 3/06/2014.
  */
 class DependencyFetchTask extends DefaultTask {
-    String libDir
+    private XamarinProject xProj
     private Configuration mConfiguration
 
     def setConfiguration(Configuration c) {
         mConfiguration = c
 
         inputs.source(mConfiguration)
-        outputs.dir(libDir)
+        outputs.dir(xProj.dependencyDir)
         outputs.upToDateWhen {
             false
         }
+    }
+
+    def setXamarinProject(XamarinProject xp) {
+        this.xProj = xp
+    }
+
+    def getXamarinProject() {
+        this.xProj
     }
 
     @TaskAction
     def fetch() {
         mConfiguration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
             def newName = "${artifact.name}.${artifact.extension}"
-            println "${libDir}/${newName}"
+            println "${xamarinProject.dependencyDir}/${newName}"
             project.copy {
                 from artifact.file
-                into (libDir)
+                into (xamarinProject.dependencyDir)
                 rename { newName }
             }
         }

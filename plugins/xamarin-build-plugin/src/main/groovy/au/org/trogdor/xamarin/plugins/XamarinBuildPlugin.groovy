@@ -14,11 +14,21 @@ class XamarinBuildPlugin implements Plugin<Project> {
 		project.extensions.create("xamarin", XamarinBuildExtension, project)
 
         project.afterEvaluate() {
-            if (project.xamarin.xamarinProject)
+            if (project.xamarin.xamarinProject) {
                 project.task("fetchXamarinDependencies", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-                    libDir = project.xamarin.xamarinProject.dependencyDir
+                    xamarinProject = project.xamarin.xamarinProject
                     configuration = project.configurations.xamarinCompile
                 }
+//                project.xamarin.xamarinProject.configurations.each() { xConf ->
+//                    def config = project.configurations.create("xamarinCompile-${xConf.name}") {
+//                        extendsFrom project.configurations.xamarinCompile
+//                    }
+//                    project.task("fetchXamarinDependencies-${xConf.name}", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+//                        libDir = project.xamarin.xamarinProject.dependencyDir
+//                        configuration = config
+//                    }
+//                }
+            }
         }
     }
 }

@@ -36,47 +36,62 @@ class XamarinPublishExtension {
         mRepository
     }
 
-    void mavenTask(String configuration) {
+    void mavenTask(String conf) {
 
         project.configure(project) {
-            XamarinProject xamarinProject = project.xamarin.xamarinProject
-            def configurations = xamarinProject.configurationContainer
-            def resolvedArtifactId = project.xamarinPublish.artifactId ?: xamarinProject.projectName
-            def buildOutput = configurations.getByName(configuration).buildOutput
-
             apply plugin: 'maven-publish'
-
-            def debugSymbolsPath = configurations.getByName(configuration).buildOutput + ".mdb"
-            def debugFile = project.file(debugSymbolsPath)
-            if (debugFile.exists()) {
-                project.publishing {
-                    publications {
-                        xamarinComponent(MavenPublication) {
-                            artifactId resolvedArtifactId
-                            artifact(buildOutput) {
-                                extension "dll"
-                            }
-                            artifact(debugSymbolsPath) {
-                                classifier "debug-symbols"
-                                extension "dll.mdb"
-                            }
-                        }
-                    }
-                }
-            } else {
-                project.publishing {
-                    publications {
-                        xamarinComponent(MavenPublication) {
-                            artifactId resolvedArtifactId
-                            artifact(buildOutput) {
-                                extension "dll"
-                            }
-                        }
-                    }
-                }
-            }
-
         }
+
+        XamarinProject xamarinProject = project.xamarin.xamarinProject
+        def resolvedArtifactId = project.xamarinPublish.artifactId ?: xamarinProject.projectName
+
+        MavenPublication publication = project.publishing.publications.create('xamarinComponent', MavenPublication)
+        xamarinProject.configurations.all() {configuration->
+            def classifierName = configuration.name.toLowerCase()
+            if (project.file(configuration.buildOutput).exists())
+                publication.artifact(buildOutput) {
+                    extension "dll"
+                    classifier classifierName
+                }
+
+            def symbolsPath = configuration.buildOutput + ".mdb"
+            if (project.file(symbolsPath).exists())
+                publication.artifact(symbolsPath) {
+                    extension "dll.mdb"
+                    classifier "$classifierName-symbols"
+                }
+        }
+
+//
+//            def debugSymbolsPath = configurations.getByName(configuration).buildOutput + ".mdb"
+//            def debugFile = project.file(debugSymbolsPath)
+//            if (debugFile.exists()) {
+//                project.publishing {
+//                    publications {
+//                        xamarinComponent(MavenPublication) {
+//                            artifactId resolvedArtifactId
+//                            artifact(buildOutput) {
+//                                extension "dll"
+//                            }
+//                            artifact(debugSymbolsPath) {
+//                                classifier "debug-symbols"
+//                                extension "dll.mdb"
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+//                project.publishing {
+//                    publications {
+//                        xamarinComponent(MavenPublication) {
+//                            artifactId resolvedArtifactId
+//                            artifact(buildOutput) {
+//                                extension "dll"
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         /*
         def taskName = configuration.replaceAll(~/\|/, "")
         def buildTaskName = "xamarinBuild-$taskName"
