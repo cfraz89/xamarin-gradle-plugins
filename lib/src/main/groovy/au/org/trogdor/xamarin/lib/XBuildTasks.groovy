@@ -46,6 +46,13 @@ class XBuildAndroidPackageTask extends XBuildTask {
 }
 
 class XBuildCleanTask extends XBuildTask {
+    @TaskAction
+    def executeTask() {
+        super.executeTask()
+        println "Deleting dependencies"
+        project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
+    }
+
 	def generateCommand() {
 		[project.xamarin.xbuildPath, projectFilePath,  '/t:Clean']
 	}

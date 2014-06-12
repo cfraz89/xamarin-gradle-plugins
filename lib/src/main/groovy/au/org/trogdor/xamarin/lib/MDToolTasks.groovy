@@ -13,7 +13,7 @@ class MDToolTask extends DefaultTask {
 	}
 
 	@TaskAction
-	def build() {
+	def executeTask() {
 		solutionFilePath = project.file(xamarinProject.solutionFile).path
 		def proc = generateCommand().execute()
 		def serr = new ByteArrayOutputStream(4096)
@@ -34,7 +34,7 @@ class MDToolCompileTask extends MDToolTask {
 
 class MDToolCleanTask extends MDToolTask {
     @TaskAction
-    def build() {
+    def executeTask() {
         def serr = new ByteArrayOutputStream(4096)
 
         solutionFilePath = project.file(xamarinProject.solutionFile).path
@@ -45,6 +45,9 @@ class MDToolCleanTask extends MDToolTask {
             if (proc.exitValue())
                 throw new TaskExecutionException(this, null)
         }
+
+        println "Deleting dependencies"
+        project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
     }
 
 	def generateCommand(XamarinConfiguration configuration) {
