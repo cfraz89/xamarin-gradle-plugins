@@ -46,27 +46,30 @@ class XamarinPublishExtension {
 
             apply plugin: 'maven-publish'
 
-            project.publishing {
-                publications {
-                    xamarinComponent(MavenPublication) {
-                        artifactId resolvedArtifactId
-                        artifact(buildOutput) {
-                            extension "dll"
-                        }
-                    }
-                }
-            }
-
             def debugSymbolsPath = configurations.getByName(configuration).buildOutput + ".mdb"
             def debugFile = project.file(debugSymbolsPath)
             if (debugFile.exists()) {
                 project.publishing {
                     publications {
-                        xamarinComponentDebugSymbols(MavenPublication) {
+                        xamarinComponent(MavenPublication) {
                             artifactId resolvedArtifactId
+                            artifact(buildOutput) {
+                                extension "dll"
+                            }
                             artifact(debugSymbolsPath) {
                                 classifier "debug-symbols"
                                 extension "dll.mdb"
+                            }
+                        }
+                    }
+                }
+            } else {
+                project.publishing {
+                    publications {
+                        xamarinComponent(MavenPublication) {
+                            artifactId resolvedArtifactId
+                            artifact(buildOutput) {
+                                extension "dll"
                             }
                         }
                     }
