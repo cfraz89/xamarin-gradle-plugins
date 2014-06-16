@@ -131,6 +131,13 @@ class iOSAppConfiguration extends XamarinConfiguration {
         return output
     }
 
+    protected def setTaskOutput(Task task, String output) {
+        if (output) {
+            task.outputs.file(output)
+            task.outputs.upToDateWhen() { false }
+        }
+    }
+
     def getResolvedIPhoneSimulatorBuildOutput() {
         resolvedIPhoneSimulatorOutput
     }
