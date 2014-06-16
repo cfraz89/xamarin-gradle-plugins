@@ -49,7 +49,6 @@ class XamarinPublishExtension {
             publication.artifactId = resolvedArtifactId
             xamarinProject.configurations.all() { configuration ->
                 def classifierName = configuration.name.toLowerCase()
-                println configuration.resolvedBuildOutput
                 if (project.file(configuration.resolvedBuildOutput).exists())
                     publication.artifact(resolvedBuildOutput) {
                         extension "dll"
