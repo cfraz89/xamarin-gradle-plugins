@@ -28,7 +28,7 @@ class XamarinConfiguration {
 
 class XamarinSingleBuildConfiguration extends XamarinConfiguration {
     protected String mBuildOutput
-    protected String resolvedBuildOutput
+    protected String mResolvedBuildOutput
     protected String buildExtension
 
     def XamarinSingleBuildConfiguration(String name, Project project, XamarinProject xamarinProject) {
@@ -54,7 +54,6 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
     }
 
     def makeTasks() {
-        resolvedBuildOutput = resolveBuildOutput(mBuildOutput)
         def task = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
@@ -71,8 +70,10 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
         mBuildOutput = fileName
     }
 
-    def getResolvedBuildOutput(String fileName) {
-        resolvedBuildOutput
+    def getResolvedBuildOutput() {
+        if (!mResolvedBuildOutput)
+            mResolvedBuildOutput = resolveBuildOutput(mBuildOutput)
+        mResolvedBuildOutput
     }
 }
 

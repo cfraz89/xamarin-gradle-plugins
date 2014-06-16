@@ -37,31 +37,29 @@ class XamarinPublishExtension {
     }
 
     void mavenPublish() {
-        project.afterEvaluate {
-            project.configure(project) {
-                apply plugin: 'maven-publish'
-            }
+        project.configure(project) {
+            apply plugin: 'maven-publish'
+        }
 
-            XamarinProject xamarinProject = project.xamarin.xamarinProject
-            def resolvedArtifactId = project.xamarinPublish.artifactId ?: xamarinProject.projectName
+        XamarinProject xamarinProject = project.xamarin.xamarinProject
+        def resolvedArtifactId = project.xamarinPublish.artifactId ?: xamarinProject.projectName
 
-            MavenPublication publication = project.publishing.publications.create('xamarinComponent', MavenPublication)
-            publication.artifactId = resolvedArtifactId
-            xamarinProject.configurations.all() { configuration ->
-                def classifierName = configuration.name.toLowerCase()
-                if (project.file(configuration.resolvedBuildOutput).exists())
-                    publication.artifact(resolvedBuildOutput) {
-                        extension "dll"
-                        classifier classifierName
-                    }
+        MavenPublication publication = project.publishing.publications.create('xamarinComponent', MavenPublication)
+        publication.artifactId = resolvedArtifactId
+        xamarinProject.configurations.all() { configuration ->
+            def classifierName = configuration.name.toLowerCase()
+            if (project.file(configuration.resolvedBuildOutput).exists())
+                publication.artifact(resolvedBuildOutput) {
+                    extension "dll"
+                    classifier classifierName
+                }
 
-                def symbolsPath = configuration.resolvedBuildOutput + ".mdb"
-                if (project.file(symbolsPath).exists())
-                    publication.artifact(symbolsPath) {
-                        extension "dll.mdb"
-                        classifier "$classifierName-symbols"
-                    }
-            }
+            def symbolsPath = configuration.resolvedBuildOutput + ".mdb"
+            if (project.file(symbolsPath).exists())
+                publication.artifact(symbolsPath) {
+                    extension "dll.mdb"
+                    classifier "$classifierName-symbols"
+                }
         }
     }
 }
