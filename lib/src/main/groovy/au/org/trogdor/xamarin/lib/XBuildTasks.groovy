@@ -10,7 +10,7 @@ class XBuildTask extends DefaultTask {
 
 	protected def projectFilePath
 
-	def generateCommand() {
+	def generateCommand(XamarinConfiguration config) {
 		return []
 	}
 
@@ -23,37 +23,43 @@ class XBuildTask extends DefaultTask {
 
 	@TaskAction
 	def executeTask() {
-		projectFilePath = generateProjectFilePath()
-		def proc = generateCommand().execute()
-		proc.in.eachLine { line-> println line}
-		proc.waitFor()
-		if(proc.exitValue())
-			throw new TaskExecutionException(this, null)
+        executeForConfiguration(configuration)
 	}
+
+    def executeForConfiguration(XamarinConfiguration config) {
+        projectFilePath = generateProjectFilePath()
+        def proc = generateCommand(config).execute()
+        def serr = new ByteArrayOutputStream(4096)
+        proc.waitForProcessOutput(System.out, serr)
+        if(proc.exitValue())
+            throw new TaskExecutionException(this, null)
+    }
 }
 
 class XBuildCompileTask extends XBuildTask {
-	def generateCommand() {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration.name}", '/t:Build']
+	def generateCommand(XamarinConfiguration config) {
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:Build']
 	}
 }
 
 
 class XBuildAndroidPackageTask extends XBuildTask {
-	def generateCommand() {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${configuration.name}", '/t:PackageForAndroid']
+	def generateCommand(XamarinConfiguration config) {
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:PackageForAndroid']
 	}
 }
 
 class XBuildCleanTask extends XBuildTask {
     @TaskAction
     def executeTask() {
-        super.executeTask()
+        xamarinProject.configurationContainer.all() { config ->
+            executeForConfiguration(config)
+        }
         println "Deleting dependencies"
         project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
     }
 
-	def generateCommand() {
-		[project.xamarin.xbuildPath, projectFilePath,  '/t:Clean']
+	def generateCommand(XamarinConfiguration config) {
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:Clean']
 	}
 }

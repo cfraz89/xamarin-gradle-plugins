@@ -11,54 +11,160 @@ class XamarinConfiguration {
     final String name
     final Project project
     final XamarinProject xPrj
-    private String buildOutput
 
     def XamarinConfiguration(String name, Project project, XamarinProject xamarinProject) {
         this.name = name
         this.project = project
         this.xPrj = xamarinProject
+
+        project.configurations.create("xamarinCompile$name") {
+            extendsFrom project.configurations.xamarinCompile
+        }
+    }
+
+    def makeTasks()
+    {}
+}
+
+class XamarinSingleBuildConfiguration extends XamarinConfiguration {
+    protected String mBuildOutput
+    protected String resolvedBuildOutput
+    protected String buildExtension
+
+    def XamarinSingleBuildConfiguration(String name, Project project, XamarinProject xamarinProject) {
+        super(name, project, xamarinProject)
+        buildExtension = "dll"
+    }
+
+    protected def resolveBuildOutput(String overrideOutput) {
+        String output
+        if (!overrideOutput && xPrj.projectName)
+            output = "bin/${name}/${xPrj.projectName}.${buildExtension}"
+        else
+            output = overrideOutput
+
+        return output
     }
 
     protected def setTaskOutput(Task task, String output) {
-        if (!output && xPrj.projectName)
-            output = "bin/${name}/${xPrj.projectName}.dll"
         if (output) {
             task.outputs.file(output)
             task.outputs.upToDateWhen() { false }
         }
-        return output
     }
 
-    //protected def getTaskName() {
-    //    name.replaceAll(~/\|/, "")
-    //}
-
-    def build(String outFile) {
+    def makeTasks() {
+        resolvedBuildOutput = resolveBuildOutput(mBuildOutput)
         def task = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
         }
-        buildOutput = setTaskOutput(task, outFile)
+        project.tasks.xamarinBuildAll.dependsOn(task)
+        setTaskOutput(task, resolvedBuildOutput)
     }
 
-    def getBuildOutput() {
-        return buildOutput
+    def setBuildOutput(String fileName) {
+        mBuildOutput = fileName
+    }
+
+    def buildOutput(String fileName) {
+        mBuildOutput = fileName
+    }
+
+    def getResolvedBuildOutput(String fileName) {
+        resolvedBuildOutput
     }
 }
 
 @InheritConstructors
-class AndroidConfiguration extends XamarinConfiguration {
-    private String packageOutput
+class AndroidLibraryConfiguration extends XamarinSingleBuildConfiguration {
+}
 
-    def androidPackage(String outFile) {
-        def task = project.task("xamarinPackage-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: XBuildAndroidPackageTask) {
-            xamarinProject = xPrj
-            configuration = this
-        }
-        packageOutput = setTaskOutput(task, outFile)
-    }
-
-    def getPackageOutput() {
-        return packageOutput;
+class AndroidAppConfiguration extends XamarinSingleBuildConfiguration {
+    def AndroidAppConfiguration(String name, Project project, XamarinProject xamarinProject) {
+        super(name, project, xamarinProject)
+        buildExtension = "apk"
     }
 }
+
+@InheritConstructors
+class iOSLibraryConfiguration extends XamarinSingleBuildConfiguration {
+}
+
+@InheritConstructors
+class iOSAppConfiguration extends XamarinConfiguration {
+    private String mIPhoneSimulatorOutput
+    private String mIPhoneOutput
+
+    private String resolvedIPhoneSimulatorOutput
+    private String resolvedIPhoneOutput
+
+    def makeTasks() {
+        resolvedIPhoneSimulatorOutput = resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
+        resolvedIPhoneOutput = resolveBuildOutput(mIPhoneOutput, 'iPhone')
+
+        def iPhoneSimulatorTask = project.task("xamarinBuild-${name}-iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+            xamarinProject = xPrj
+            configuration = this
+            device = "iPhoneSimulator"
+        }
+        def iPhoneTask = project.task("xamarinBuild-${name}-iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+            xamarinProject = xPrj
+            configuration = this
+            device = "iPhone"
+        }
+        setTaskOutput(iPhoneSimulatorTask, resolvedIPhoneSimulatorOutput)
+        setTaskOutput(iPhoneTask, resolvedIPhoneOutput)
+
+        def buildTask = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
+        project.tasks.xamarinBuildAll.dependsOn(buildTask)
+
+    }
+
+    protected def resolveBuildOutput(String overrideOutput, String device) {
+        String output
+        if (!overrideOutput && xPrj.projectName)
+            output = "bin/${device}/${name}/${xPrj.projectName}.dll"
+        else
+            output = overrideOutput
+
+        return output
+    }
+
+    def getResolvedIPhoneSimulatorBuildOutput() {
+        resolvedIPhoneSimulatorOutput
+    }
+
+    def setIPhoneSimulatorBuildOutput(String output) {
+        mIPhoneSimulatorOutput = output
+    }
+
+    def iPhoneSimulatorBuildOutput(String output) {
+        mIPhoneSimulatorOutput = output
+    }
+
+    def getResolvedIPhoneBuildOutput() {
+        resolvedIPhoneOutput
+    }
+
+    def setIPhoneBuildOutput(String output) {
+        mIPhoneOutput = output
+    }
+
+    def iPhoneBuildOutput(String output) {
+        mIPhoneOutput = output
+    }
+}
+
+
+@InheritConstructors
+class GenericLibraryConfiguration extends XamarinSingleBuildConfiguration {
+}
+
+class GenericAppConfiguration extends XamarinSingleBuildConfiguration {
+    def GenericAppConfiguration(String name, Project project, XamarinProject xamarinProject) {
+        super(name, project, xamarinProject)
+        buildExtension = "exe"
+    }
+}
+

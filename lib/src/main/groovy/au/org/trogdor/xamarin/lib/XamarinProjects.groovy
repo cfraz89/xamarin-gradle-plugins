@@ -13,9 +13,6 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 
 	XamarinProject(Project prj) {
         this.project = prj
-        prj.task("xamarinClean", description: "Clean the Xamarin project", group: "Xamarin", type: cleanTask()) {
-            xamarinProject = this
-        }
         configurationContainer = prj.container(XamarinConfiguration, this)
     }
 
@@ -27,18 +24,7 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
         return mProjectName;
     }
 
-    protected def makeConfiguration(String name) {
-        def config = project.configurations.create("xamarinCompile-$name") {
-            extendsFrom project.configurations.xamarinCompile
-        }
-        project.task("fetchXamarinDependencies-$name", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-            xamarinProject = this
-            configuration = config
-        }
-    }
-
     XamarinConfiguration create(String name) {
-        makeConfiguration(name)
         return new XamarinConfiguration(name, project, this)
     }
 
@@ -81,10 +67,20 @@ class XBuildProject extends XamarinProject {
 }
 
 @InheritConstructors
-class XBuildAndroidProject extends XBuildProject {
+class AndroidLibraryProject extends XBuildProject {
     XamarinConfiguration create(String name) {
-        makeConfiguration(name)
-        return new AndroidConfiguration(name, project, this)
+        return new AndroidLibraryConfiguration(name, project, this)
+    }
+}
+
+@InheritConstructors
+class AndroidAppProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new AndroidAppConfiguration(name, project, this)
+    }
+
+    def buildTask() {
+        return XBuildAndroidPackageTask
     }
 }
 
@@ -107,4 +103,33 @@ class MDToolProject extends XamarinProject {
 	def cleanTask() {
 		return MDToolCleanTask
 	}
+}
+
+@InheritConstructors
+class iOSLibraryProject extends MDToolProject {
+    XamarinConfiguration create(String name) {
+        return new iOSLibraryConfiguration(name, project, this)
+    }
+}
+
+
+@InheritConstructors
+class iOSAppProject extends MDToolProject {
+    XamarinConfiguration create(String name) {
+        return new iOSAppConfiguration(name, project, this)
+    }
+}
+
+@InheritConstructors
+class GenericLibraryProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new GenericLibraryConfiguration(name, project, this)
+    }
+}
+
+@InheritConstructors
+class GenericAppProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new GenericAppConfiguration(name, project, this)
+    }
 }

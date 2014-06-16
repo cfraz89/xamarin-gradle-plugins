@@ -6,53 +6,53 @@ import org.gradle.api.tasks.TaskExecutionException
 
 class MDToolTask extends DefaultTask {
 	XamarinProject xamarinProject
+    XamarinConfiguration configuration
+    String device
+
 	protected def solutionFilePath
 
 	def generateCommand() {
 		return []
 	}
 
+    def getDeviceTag() {
+        device ? "|" + device : ""
+    }
+
 	@TaskAction
 	def executeTask() {
-		solutionFilePath = project.file(xamarinProject.solutionFile).path
-		def proc = generateCommand().execute()
-		def serr = new ByteArrayOutputStream(4096)
-		proc.waitForProcessOutput(System.out, serr)
-
-		if(proc.exitValue())
-			throw new TaskExecutionException(this, null)
+		executeForConfiguration(configuration)
 	}
+
+    def executeForConfiguration(XamarinConfiguration config) {
+        solutionFilePath = project.file(xamarinProject.solutionFile).path
+        def proc = generateCommand(config).execute()
+        def serr = new ByteArrayOutputStream(4096)
+        proc.waitForProcessOutput(System.out, serr)
+
+        if(proc.exitValue())
+            throw new TaskExecutionException(this, null)
+    }
 }
 
 class MDToolCompileTask extends MDToolTask {
-    XamarinConfiguration configuration
-
-	def generateCommand() {
-		def cmd = [project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
-        println cmd
-        return cmd
+	def generateCommand(XamarinConfiguration config) {
+		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
 	}
 }
 
 class MDToolCleanTask extends MDToolTask {
     @TaskAction
     def executeTask() {
-        def serr = new ByteArrayOutputStream(4096)
-
-        solutionFilePath = project.file(xamarinProject.solutionFile).path
-        xamarinProject.configurationContainer.all() { configuration ->
-            def proc = generateCommand(configuration).execute()
-            proc.waitForProcessOutput(System.out, serr)
-
-            if (proc.exitValue())
-                throw new TaskExecutionException(this, null)
+        xamarinProject.configurationContainer.all() { config ->
+            executeForConfiguration(config)
         }
 
         println "Deleting dependencies"
         project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
     }
 
-	def generateCommand(XamarinConfiguration configuration) {
-		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.projectName}", "-c:${configuration.name}|iPhone", solutionFilePath]
+	def generateCommand(XamarinConfiguration config) {
+		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.projectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
 	}
 }

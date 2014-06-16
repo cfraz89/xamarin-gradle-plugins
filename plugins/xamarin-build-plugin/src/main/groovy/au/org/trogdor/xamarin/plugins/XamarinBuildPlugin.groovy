@@ -2,7 +2,12 @@ package au.org.trogdor.xamarin.plugins
 
 import au.org.trogdor.xamarin.lib.XamarinProject
 import au.org.trogdor.xamarin.lib.XBuildProject
-import au.org.trogdor.xamarin.lib.XBuildAndroidProject
+import au.org.trogdor.xamarin.lib.AndroidAppProject
+import au.org.trogdor.xamarin.lib.AndroidLibraryProject
+import au.org.trogdor.xamarin.lib.iOSAppProject
+import au.org.trogdor.xamarin.lib.iOSLibraryProject
+import au.org.trogdor.xamarin.lib.GenericLibraryProject
+import au.org.trogdor.xamarin.lib.GenericAppProject
 import au.org.trogdor.xamarin.lib.MDToolProject
 import au.org.trogdor.xamarin.lib.DependencyFetchTask
 import org.gradle.api.Project
@@ -15,19 +20,20 @@ class XamarinBuildPlugin implements Plugin<Project> {
 
         project.afterEvaluate() {
             if (project.xamarin.xamarinProject) {
-                project.task("fetchXamarinDependencies", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-                    xamarinProject = project.xamarin.xamarinProject
-                    configuration = project.configurations.xamarinCompile
+                def xProj = project.xamarin.xamarinProject
+                project.task("xamarinBuildAll", description: "Build all configurations", group: "Xamarin")
+                project.task("xamarinClean", description: "Clean the Xamarin project", group: "Xamarin", type: xProj.cleanTask()) {
+                    xamarinProject = xProj
                 }
-//                project.xamarin.xamarinProject.configurations.each() { xConf ->
-//                    def config = project.configurations.create("xamarinCompile-${xConf.name}") {
-//                        extendsFrom project.configurations.xamarinCompile
-//                    }
-//                    project.task("fetchXamarinDependencies-${xConf.name}", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-//                        libDir = project.xamarin.xamarinProject.dependencyDir
-//                        configuration = config
-//                    }
-//                }
+                xProj.configurations.each() { xConf ->
+                    def config = project.configurations.findByName("xamarinCompile${xConf.name}")
+                    project.task("fetchXamarinDependencies-${xConf.name}", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+                        xamarinProject = xProj
+                        configuration = config
+                    }
+
+                    xConf.makeTasks()
+                }
             }
         }
     }
@@ -73,16 +79,28 @@ class XamarinBuildExtension {
         return mMDToolPath
     }
 
-	def androidProject(Closure closure) {
-		setProject(new XBuildAndroidProject(project), closure)
+	def androidAppProject(Closure closure) {
+		setProject(new AndroidAppProject(project), closure)
 	}
 
-	def iOSProject(Closure closure) {
-		setProject(new MDToolProject(project), closure)
+    def androidLibraryProject(Closure closure) {
+        setProject(new AndroidLibraryProject(project), closure)
+    }
+
+	def iOSAppProject(Closure closure) {
+		setProject(new iOSAppProject(project), closure)
 	}
 
-	def genericProject(Closure closure) {
-		setProject(new XBuildProject(project), closure)
+    def iOSLibraryProject(Closure closure) {
+        setProject(new iOSLibraryProject(project), closure)
+    }
+
+    def genericLibraryProject(Closure closure) {
+        setProject(new GenericLibraryProject(project), closure)
+    }
+
+	def genericAppProject(Closure closure) {
+		setProject(new GenericAppProject(project), closure)
 	}
 
 	def xbuildProject(Closure closure) {
