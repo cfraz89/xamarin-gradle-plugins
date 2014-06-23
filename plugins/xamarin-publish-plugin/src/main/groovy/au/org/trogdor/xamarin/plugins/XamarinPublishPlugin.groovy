@@ -61,5 +61,7 @@ class XamarinPublishExtension {
                     classifier "$classifierName-symbols"
                 }
         }
+        project.tasks.publishToMavenLocal.dependsOn('xamarinBuildAll')
+        project.tasks.publish.dependsOn('xamarinBuildAll')
     }
 }
