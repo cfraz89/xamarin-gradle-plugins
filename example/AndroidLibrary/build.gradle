@@ -1,0 +1,11 @@
+apply plugin: 'xamarin-build-plugin'
+
+xamarin {
+	androidLibraryProject {
+		projectName 'AndroidLibrary'
+		configurations {
+			Debug
+			Release
+		}
+	}
+}

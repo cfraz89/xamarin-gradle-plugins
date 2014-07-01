@@ -1,0 +1,27 @@
+subprojects {
+	buildscript {
+		repositories {
+			mavenLocal()
+		}
+
+		dependencies {
+	        classpath 'au.org.trogdor.xamarin-gradle-plugins:xamarin-build-plugin:+'
+	        classpath 'au.org.trogdor.xamarin-gradle-plugins:xamarin-publish-plugin:+'
+		}
+	}
+
+	version = '1.0'
+	group = 'XamarinGradlePlugin'
+
+	repositories {
+		mavenLocal()
+	}
+
+	apply plugin: 'maven-publish'
+
+	publishing {
+		repositories {
+			mavenLocal()
+		}
+	}
+}

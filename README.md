@@ -78,6 +78,8 @@ dependencies {
     xamarinCompile 'au.com.sample.group:SampleComponent:1.0'
     xamarinCompile 'au.com.sample.group:SampleComponent:1.0:debug-symbols@dll.mdb'
 }
+
+Configurations are also added per configuration specified in the project. These configurations exend xamarinCompile. Eg if configurations are 'Debug' and 'Release' - 'xamarinCompileDebug' and 'xamarinCompileRelease' will be available which apply only when building these configurations.
 ```
 
 *Tasks:*
@@ -86,19 +88,31 @@ dependencies {
 
 Android Projects
 ------------------------------
-A typical Xamarin Android project will be configured like so:
+Android projects come in two flavors:
+- androidAppProject - For Xamarin Android Application projects. Builds an apk file from the project
+- androidLibraryProject - For Xamarin Android Library projects. Builds a dll file
+
+A typical Xamarin Android Application project will be configured like so:
 ```groovy
 xamarin {
-    androidProject {
+    androidAppProject {
         projectName 'Project'
         configurations {
-            Debug {
-                build()
-            }
-            Release {
-                build()
-                androidPackage()
-            }
+            Debug
+            Release
+        }
+    }
+}
+```
+
+A typical Xamarin Android Library project will be configured like so:
+```groovy
+xamarin {
+    androidLibraryProject {
+        projectName 'Project'
+        configurations {
+            Debug
+            Release
         }
     }
 }
@@ -107,7 +121,7 @@ xamarin {
 *Tasks:*
 - xamarinBuild-Debug
 - xamarinBuild-Release
-- xamarinPackage-Release
+- xamarinBuildAll
 
 This should be sufficient for most projects.
 
@@ -120,22 +134,18 @@ However if the projectName is specified, the output file defaults to 'bin/$confi
 
 dependencyDir can also be specified, and will define where downloaded dependencies get copied into
 
-*Example configuration with all parameters:*
+*Example app configuration with all parameters:*
 ```groovy
 xamarin {
-    androidProject {
+    androidAppProject {
         projectFile '../Project.csproj'
         dependencyDir 'libs'
         configurations {
             CustomDebugTarget {
-                build 'bin/CustomFolder/CustomAssembly.dll'
+                buildOutput 'bin/CustomDebugFolder/CustomApp.apk'
             }
             CustomReleaseTarget {
-                build()
-                androidPackage 'bin/CustomFolder/CustomApp.apk'
-            }
-            CustomOtherTarget {
-                androidPackage()
+                 buildOutput 'bin/CustomReleaseFolder/CustomApp.apk'
             }
         }
     }
@@ -145,27 +155,41 @@ xamarin {
 *Tasks:*
 - xamarinBuild-CustomDebugTarget
 - xamarinBuild-CustomReleaseTarget
-- xamarinPackage-CustomReleaseTarget
-- xamarinPackage-CustomOtherTarget
+- xamarinBuildAll
 
 
 
 iOS Projects
 --------------------------
-A typical Xamarin iOS project will be configured like so:
+iOS projects similarly come in two flavors:
+- iOSAppProject: For Xamarin iOS Application projects
+- iOSLibraryProject: For Xamarin iOS Library projects
+
+A typical Xamarin iOS app project will be configured like so:
 ```groovy
 xamarin {
-    iOSProject {
+    iOSAppProject {
         projectName 'Project'
         solutionFile 'Solution.sln'
         dependencyDir 'libs'
         configurations {
-            Debug {
-                build()
-            }
-            Release {
-                build()
-            }
+            Debug
+            Release
+        }
+    }
+}
+```
+
+A typical Xamarin iOS library project will be configured like so:
+```groovy
+xamarin {
+    iOSLibraryProject {
+        projectName 'Project'
+        solutionFile 'Solution.sln'
+        dependencyDir 'libs'
+        configurations {
+            Debug
+            Release
         }
     }
 }
@@ -174,22 +198,44 @@ xamarin {
 *Tasks:*
 - xamarinBuild-Debug
 - xamarinBuild-Release
-- xamarinPackage-Release
+- xamarinBuildAll
 
 This is very similar to android projects, however instead of just project name, the solution file is required to be provided for mdtool to be able to build the project and its project dependencies.
-There is no package target for iOS apps, as an ipa package is automatically built when specified under the build configuration in Xamarin Studio.
+For app projects, an ipa will be built if specified in the Xamarin project settings for the built configuration.
+
+Generic Projects
+--------------------------
+Similarly, there are configurations for standard Xamarin/Mono projects:
+- genericAppProject
+- genericLibraryProject
+
+Configuration follows the same pattern as Android and iOS projects
 
 Using the publishing plugin
 ---------------------------
-The publishing plugin leverages the maven-publish plugin, adding a maven publishing configuration for a specified configuration's build() target.
-Under this maven configuration, the output dll will be added as an artifact, with artifactId equal to to the projectName by default, and other parameters (group, version) pulled from the project properties.
+The publishing plugin leverages the maven-publish plugin, adding a maven publishing configuration for the project.
+Under this maven configuration, the output dll for each configuration will be added as an artifact, with artifactId equal to to the projectName by default, and other parameters (group, version) pulled from the project properties. The configuration name will be used as the classifier
 If the mdb debug file exists in the specified configuration, it will be published with the 'debug-symbols' classifier. 
-This will add the typical maven publishing tasks.
+This will add the typical maven publishing tasks. The 'publish' and 'publishToMavenLocal' tasks will be configured to depend on 'xamarinBuildAll', making an easy workflow where libraries can be published with one command.
 
 *Typical configuration:*
 ```groovy
 xamarinPublish {
-	mavenTask 'Release'
+	mavenPublish()
+}
+```
+
+The project could then be used as a dependency as such:
+```groovy
+dependencies {
+	//For all configurations
+    xamarinCompile 'artifact.group:artifactid:1.0:release@dll'
+    
+    //Or
+    xamarinCompileDebug 'artifact.group:artifactid:1.0:debug@dll'
+    'artifact.group:artifactid:1.0:debug-symbols@dll.mdb'
+
+    xamarinCompileRelease 'artifact.group:artifactid:1.0:release@dll',
 }
 ```
 
@@ -201,8 +247,8 @@ In this example, the dll produced by the Release configuration of the specified 
 *Custom artifactId:*
 ```groovy
 xamarinPublish {
-	mavenTask 'Release'
 	artifactId 'CustomArtifact'
+	mavenPublish()
 }
 ```
 

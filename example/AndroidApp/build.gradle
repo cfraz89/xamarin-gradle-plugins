@@ -1,0 +1,21 @@
+apply plugin: 'xamarin-build-plugin'
+
+xamarin {
+	androidAppProject {
+		projectName 'AndroidApp'
+		configurations {
+			Debug
+			Release
+		}
+	}
+}
+
+dependencies {/*
+	xamarinCompile 'Example.Library:1.0',
+    
+	xamarinCompileDebug 'Example.OtherLibrary:1.0:debug@dll',
+		'Example.OtherLibrary::1.0:debug-symbols@dll.mdb'
+        
+	xamarinCompileRelease 'Example.OtherLibrary:1.0:release@dll'
+	*/
+}

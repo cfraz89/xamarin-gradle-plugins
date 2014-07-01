@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidLibrary", "AndroidLibrary\AndroidLibrary.csproj", "{F85DB6C6-461F-41B5-A41F-98EC56DD5617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iOSLibrary", "iOSLibrary\iOSLibrary.csproj", "{D6D96023-CDE5-4D8A-8C3E-EB1C6137F046}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iOSApp", "iOSApp\iOSApp.csproj", "{B9FC5B65-C3EE-4B78-B03B-B72804F33D7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidApp", "AndroidApp\AndroidApp.csproj", "{963163EB-8F5A-483E-9C05-87B6568BC57D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{963163EB-8F5A-483E-9C05-87B6568BC57D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{963163EB-8F5A-483E-9C05-87B6568BC57D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{963163EB-8F5A-483E-9C05-87B6568BC57D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{963163EB-8F5A-483E-9C05-87B6568BC57D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9FC5B65-C3EE-4B78-B03B-B72804F33D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9FC5B65-C3EE-4B78-B03B-B72804F33D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9FC5B65-C3EE-4B78-B03B-B72804F33D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9FC5B65-C3EE-4B78-B03B-B72804F33D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D96023-CDE5-4D8A-8C3E-EB1C6137F046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D96023-CDE5-4D8A-8C3E-EB1C6137F046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D96023-CDE5-4D8A-8C3E-EB1C6137F046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D96023-CDE5-4D8A-8C3E-EB1C6137F046}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F85DB6C6-461F-41B5-A41F-98EC56DD5617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F85DB6C6-461F-41B5-A41F-98EC56DD5617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F85DB6C6-461F-41B5-A41F-98EC56DD5617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F85DB6C6-461F-41B5-A41F-98EC56DD5617}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = AndroidLibrary\AndroidLibrary.csproj
+	EndGlobalSection
+EndGlobal
