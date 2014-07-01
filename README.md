@@ -6,7 +6,7 @@ There are three plugins currently:
 
 - xamarin-build-plugin: Allows you to build existing Xamarin.Android (compile and apk), Xamarin.iOS, and vanilla Xamarin projects by invoking builds against the .csproj/.sln files.
   Provides support for fetching dependencies under the 'xamarinCompile' configuration.
-- xamarin-publish-plugin (optional): Adds configuration and tasks to publish a project configured with the build plugin to maven, using the maven-publish plugin.
+- xamarin-publish-plugin (optional): Adds configuration and tasks to publish a project configured with the build plugin to maven, eusing the maven-publish plugin.
 
 Using these plugins in tandem will allow you to integrate Maven dependency management into your Xamarin projects for more modular builds.
 
@@ -61,7 +61,7 @@ xamarin {
 Dependencies
 ------------------------------
 The 'xamarinCompile' configuration is added by the build plugin. DLL's which have been packaged as maven artifacts can be used here,
-and will be copied into a 'dependencies' (by default) folder with the 'fetchXamarinDependencies' task, which also runs before build steps.
+and will be copied into a 'dependencies' (by default) folder with the 'fetchXamarinDependencies-{configuration}' task, which also runs before build steps.
 
 *Example:*
 ```groovy
@@ -83,7 +83,7 @@ Configurations are also added per configuration specified in the project. These 
 ```
 
 *Tasks:*
-- fetchXamarinDependencies
+- fetchXamarinDependencies-{configuration}
 
 
 Android Projects
@@ -218,13 +218,6 @@ Under this maven configuration, the output dll for each configuration will be ad
 If the mdb debug file exists in the specified configuration, it will be published with the 'debug-symbols' classifier. 
 This will add the typical maven publishing tasks. The 'publish' and 'publishToMavenLocal' tasks will be configured to depend on 'xamarinBuildAll', making an easy workflow where libraries can be published with one command.
 
-*Typical configuration:*
-```groovy
-xamarinPublish {
-	mavenPublish()
-}
-```
-
 The project could then be used as a dependency as such:
 ```groovy
 dependencies {
@@ -242,13 +235,13 @@ dependencies {
 *Tasks:*
 - Standard maven tasks
 
-In this example, the dll produced by the Release configuration of the specified project will be published.
+Applying this plugin is all the configuration usually required.
+However, the artifactId can be overridden. By default it is derived from the project name.
 
 *Custom artifactId:*
 ```groovy
 xamarinPublish {
 	artifactId 'CustomArtifact'
-	mavenPublish()
 }
 ```
 

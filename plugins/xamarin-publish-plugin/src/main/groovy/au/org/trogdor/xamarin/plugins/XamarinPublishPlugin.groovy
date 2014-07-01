@@ -10,22 +10,20 @@ import org.gradle.api.publish.maven.MavenPublication
 class XamarinPublishPlugin implements Plugin<Project> {
 	void apply(Project project) {
         project.extensions.create("xamarinPublish", XamarinPublishExtension, project)
+        project.plugins.apply('maven-publish')
         ((ProjectInternal)project).getConfigurationActions().add(new Action<ProjectInternal>() {
             @java.lang.Override
             void execute(ProjectInternal projectInternal) {
-                if (projectInternal.plugins.hasPlugin('maven-publish')) {
+                XamarinProject xamarinProject = projectInternal.xamarin.xamarinProject
+                def resolvedArtifactId = projectInternal.xamarinPublish.artifactId ?: xamarinProject.projectName
 
-                    XamarinProject xamarinProject = projectInternal.xamarin.xamarinProject
-                    def resolvedArtifactId = projectInternal.xamarinPublish.artifactId ?: xamarinProject.projectName
-
-                    MavenPublication publication = projectInternal.publishing.publications.create('xamarin', MavenPublication)
-                    publication.artifactId = resolvedArtifactId
-                    xamarinProject.configurations.all {configuration->
-                        addArtifacts(configuration, publication, projectInternal)
-                    }
-                    projectInternal.tasks.publishToMavenLocal.dependsOn('xamarinBuildAll')
-                    projectInternal.tasks.publish.dependsOn('xamarinBuildAll')
+                MavenPublication publication = projectInternal.publishing.publications.create('xamarin', MavenPublication)
+                publication.artifactId = resolvedArtifactId
+                xamarinProject.configurations.all {configuration->
+                    addArtifacts(configuration, publication, projectInternal)
                 }
+                projectInternal.tasks.publishToMavenLocal.dependsOn('xamarinBuildAll')
+                projectInternal.tasks.publish.dependsOn('xamarinBuildAll')
             }
 
             private void addArtifacts(configuration, publication, projectInternal) {
