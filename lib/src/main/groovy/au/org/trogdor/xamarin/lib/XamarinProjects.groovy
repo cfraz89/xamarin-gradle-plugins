@@ -10,10 +10,12 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
     final NamedDomainObjectCollection<XamarinConfiguration> configurationContainer
     private String mProjectName
     private String mDepDir = "dependencies"
+    private List<String> mReferences
 
 	XamarinProject(Project prj) {
         this.project = prj
         configurationContainer = prj.container(XamarinConfiguration, this)
+        mReferences = []
     }
 
     def projectName(String name) {
@@ -42,6 +44,14 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 
     String getDependencyDir() {
         mDepDir
+    }
+
+    def references(String refProjectName) {
+        mReferences.add(refProjectName)
+    }
+
+    def getReferencedProjects() {
+        mReferences
     }
 }
 

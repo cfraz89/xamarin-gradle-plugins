@@ -12,29 +12,58 @@ import au.org.trogdor.xamarin.lib.MDToolProject
 import au.org.trogdor.xamarin.lib.DependencyFetchTask
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.artifacts.ExternalModuleDependency
 
 class XamarinBuildPlugin implements Plugin<Project> {
 	void apply(Project project) {
-        project.configurations.create("xamarinCompile")
+
+        project.configurations.create("default")
+        def compileConfig = project.configurations.create("xamarinCompile")
 		project.extensions.create("xamarin", XamarinBuildExtension, project)
 
-        project.afterEvaluate() {
+        project.afterEvaluate {
             if (project.xamarin.xamarinProject) {
-                def xProj = project.xamarin.xamarinProject
                 project.task("xamarinBuildAll", description: "Build all configurations", group: "Xamarin")
+
+                addDependenciesToProject(project)
+
+                def xProj = project.xamarin.xamarinProject
                 project.task("xamarinClean", description: "Clean the Xamarin project", group: "Xamarin", type: xProj.cleanTask()) {
                     xamarinProject = xProj
                 }
-                xProj.configurations.each() { xConf ->
-                    def config = project.configurations.findByName("xamarinCompile${xConf.name}")
-                    project.task("fetchXamarinDependencies-${xConf.name}", description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
-                        xamarinProject = xProj
-                        configuration = config
-                    }
 
-                    xConf.makeTasks()
-                }
+                setupDependencyTasks(project)
             }
+        }
+    }
+
+    def addDependenciesToProject(Project project) {
+        def xProj = project.xamarin.xamarinProject
+        xProj.referencedProjects.each() { dependencyProjectName ->
+            project.evaluationDependsOn(dependencyProjectName)
+
+            def configSuffixes = [""] + xProj.configurations.collect {it.name}
+            configSuffixes.each { configSuffix ->
+                def configName = "xamarinCompile${configSuffix}"
+                def config = project.configurations.findByName(configName)
+                def dependencyProject = project.findProject(dependencyProjectName)
+                def dependentConfig = dependencyProject.configurations.findByName(configName)
+                if (dependentConfig)
+                    config.dependencies.addAll(dependentConfig.dependencies)
+            }
+        }
+    }
+
+    def setupDependencyTasks(Project project) {
+        def xProj = project.xamarin.xamarinProject
+        xProj.configurations.each { xConf ->
+            def config = project.configurations.findByName("xamarinCompile${xConf.name}")
+            def taskName = "fetchXamarinDependencies-${xConf.name}"
+            project.task(taskName, description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+                xamarinProject = xProj
+                configuration = config
+            }
+            xConf.makeTasks()
         }
     }
 }
@@ -42,7 +71,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
 
 class XamarinBuildExtension {
 	private def Project project
-	def XamarinProject mXamarinProject
+	private def XamarinProject mXamarinProject
 
 	private String mXBuildPath = "xbuild"
 	private String mMDToolPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool"

@@ -24,6 +24,16 @@ class XamarinConfiguration {
 
     def makeTasks()
     {}
+
+    protected setupTaskDependenciesFromProjectDependencies(Task task) {
+        xPrj.referencedProjects.each { dependencyProjectName ->
+            def dependencyProject = project.findProject(dependencyProjectName)
+            def dependencyTask = dependencyProject.tasks.findByName(task.name)
+            if (dependencyTask) {
+                task.dependsOn(dependencyTask)
+            }
+        }
+    }
 }
 
 class XamarinSingleBuildConfiguration extends XamarinConfiguration {
@@ -54,12 +64,15 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
     }
 
     def makeTasks() {
-        def task = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+        def taskName = "xamarinBuild-${name}"
+        def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
         }
         project.tasks.xamarinBuildAll.dependsOn(task)
         setTaskOutput(task, resolvedBuildOutput)
+        setupTaskDependenciesFromProjectDependencies(task)
+
     }
 
     def setBuildOutput(String fileName) {
@@ -117,8 +130,13 @@ class iOSAppConfiguration extends XamarinConfiguration {
         setTaskOutput(iPhoneSimulatorTask, resolvedIPhoneSimulatorOutput)
         setTaskOutput(iPhoneTask, resolvedIPhoneOutput)
 
+        setupTaskDependenciesFromProjectDependencies(iPhoneSimulatorTask)
+        setupTaskDependenciesFromProjectDependencies(iPhoneTask)
+
         def buildTask = project.task("xamarinBuild-${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
         project.tasks.xamarinBuildAll.dependsOn(buildTask)
+
+        setupTaskDependenciesFromProjectDependencies(buildTask)
 
     }
 
