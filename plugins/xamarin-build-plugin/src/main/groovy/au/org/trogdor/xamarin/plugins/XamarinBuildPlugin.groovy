@@ -15,24 +15,42 @@ import org.gradle.api.Plugin
 import org.gradle.api.artifacts.ExternalModuleDependency
 
 class XamarinBuildPlugin implements Plugin<Project> {
+    public static String EXTENSION_NAME = "xamarin"
+    public static String CONFIG_BASE_NAME = "xamarinCompile"
+    public static String CONFIG_ALL_NAME = "xamarinCompileMapped"
+    public static String TASK_BUILD_ALL_NAME = "xamarinBuildAll"
+    public static String TASK_CLEAN_NAME = "xamarinClean"
+    public static String TASK_FETCH_DEPENDENCIES_NAME = "fetchXamarinDependencies"
+    public static String TASK_GROUP = "Xamarin"
+
 	void apply(Project project) {
+        project.with {
+            configurations.create("default")
+            def baseConfig = configurations.create(CONFIG_BASE_NAME)
+            configurations.create(CONFIG_ALL_NAME)
+		    extensions.create(EXTENSION_NAME, XamarinBuildExtension, project)
 
-        project.configurations.create("default")
-        def compileConfig = project.configurations.create("xamarinCompile")
-		project.extensions.create("xamarin", XamarinBuildExtension, project)
+            afterEvaluate {
+                if (xamarin.xamarinProject) {
+                    task(TASK_BUILD_ALL_NAME, description: "Build all configurations", group: TASK_GROUP)
+                    task(TASK_CLEAN_NAME, description: "Clean the Xamarin project", group: TASK_GROUP, type: xamarin.xamarinProject.cleanTask()) {
+                        xamarinProject = xamarin.xamarinProject
+                    }
 
-        project.afterEvaluate {
-            if (project.xamarin.xamarinProject) {
-                project.task("xamarinBuildAll", description: "Build all configurations", group: "Xamarin")
+                    xamarin.xamarinProject.configurations.each { xConf ->
+                        def config = configurations.create(CONFIG_BASE_NAME+xConf.name) {
+                            extendsFrom baseConfig
+                        }
+                        configurations.findByName(CONFIG_ALL_NAME).dependencies.each { dep->
+                            def mapping = xConf.name.toLowerCase()
+                            dependencies.add(config.name, "${dep.group}:${dep.name}:${dep.version}:${mapping}@dll")
+                        }
+                    }
 
-                addDependenciesToProject(project)
+                    addDependenciesToProject(project)
 
-                def xProj = project.xamarin.xamarinProject
-                project.task("xamarinClean", description: "Clean the Xamarin project", group: "Xamarin", type: xProj.cleanTask()) {
-                    xamarinProject = xProj
+                    setupDependencyTasks(project)
                 }
-
-                setupDependencyTasks(project)
             }
         }
     }
@@ -44,11 +62,11 @@ class XamarinBuildPlugin implements Plugin<Project> {
 
             def configSuffixes = [""] + xProj.configurations.collect {it.name}
             configSuffixes.each { configSuffix ->
-                def configName = "xamarinCompile${configSuffix}"
+                def configName = CONFIG_BASE_NAME + configSuffix
                 def config = project.configurations.findByName(configName)
                 def dependencyProject = project.findProject(dependencyProjectName)
                 def dependentConfig = dependencyProject.configurations.findByName(configName)
-                if (dependentConfig)
+                if (dependentConfig && config)
                     config.dependencies.addAll(dependentConfig.dependencies)
             }
         }
@@ -57,9 +75,9 @@ class XamarinBuildPlugin implements Plugin<Project> {
     def setupDependencyTasks(Project project) {
         def xProj = project.xamarin.xamarinProject
         xProj.configurations.each { xConf ->
-            def config = project.configurations.findByName("xamarinCompile${xConf.name}")
-            def taskName = "fetchXamarinDependencies-${xConf.name}"
-            project.task(taskName, description: "Copy dependency dlls into project", group: "Xamarin", type: DependencyFetchTask) {
+            def config = project.configurations.findByName(CONFIG_BASE_NAME + xConf.name)
+            def taskName = TASK_FETCH_DEPENDENCIES_NAME + xConf.name
+            project.task(taskName, description: "Copy dependency dlls into project", group: TASK_GROUP, type: DependencyFetchTask) {
                 xamarinProject = xProj
                 configuration = config
             }

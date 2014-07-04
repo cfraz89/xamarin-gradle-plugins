@@ -16,10 +16,6 @@ class XamarinConfiguration {
         this.name = name
         this.project = project
         this.xPrj = xamarinProject
-
-        project.configurations.create("xamarinCompile$name") {
-            extendsFrom project.configurations.xamarinCompile
-        }
     }
 
     def makeTasks()
@@ -65,7 +61,7 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
 
     def makeTasks() {
         def taskName = "xamarinBuild-${name}"
-        def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+        def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "fetchXamarinDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
         }
@@ -117,12 +113,12 @@ class iOSAppConfiguration extends XamarinConfiguration {
         resolvedIPhoneSimulatorOutput = resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
         resolvedIPhoneOutput = resolveBuildOutput(mIPhoneOutput, 'iPhone')
 
-        def iPhoneSimulatorTask = project.task("xamarinBuild-${name}-iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+        def iPhoneSimulatorTask = project.task("xamarinBuild-${name}-iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "fetchXamarinDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhoneSimulator"
         }
-        def iPhoneTask = project.task("xamarinBuild-${name}-iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "fetchXamarinDependencies-${name}", type: xPrj.buildTask()) {
+        def iPhoneTask = project.task("xamarinBuild-${name}-iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "fetchXamarinDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhone"

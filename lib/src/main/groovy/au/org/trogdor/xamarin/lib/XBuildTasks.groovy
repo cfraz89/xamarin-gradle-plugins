@@ -1,5 +1,6 @@
 package au.org.trogdor.xamarin.lib
 
+import org.apache.commons.io.output.ByteArrayOutputStream
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskExecutionException
