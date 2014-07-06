@@ -63,8 +63,12 @@ Dependencies
 ------------------------------
 The 'references' configuration is added by the build plugin. DLL's which have been packaged as maven artifacts can be used here,
 and will be copied into a 'dependencies' (by default) folder with the 'installDependencies<configuration>' task, which also runs before build steps.
+
 The 'referencesMatched' configuration may also be used, which will use the correct maven classifier for your compiled configuration.
 This is useful when used for library published with the xamarin-publishing-plugin, which published all configurations of a dll under classifiers named after the configuration.
+
+You can use 'xamarin.referenceProject(projectPath)' to form a transitive dependency link to another gradle xamarin projecct, and all the dependent project's dependency dlls will be installed into this project.
+
 *Example:*
 ```groovy
 dependencies {
@@ -72,6 +76,9 @@ dependencies {
 
     //Or use debug dll for Debug configuration, release dll for Release configuration, etc
     referencesMatched 'au.com.sample.group:SampleComponent:1.0'
+
+    //Depend on dlls references from other project
+    xamarin.referenceProject(':subproject:sampleproject')
 }
 ```
 
@@ -87,7 +94,7 @@ dependencies {
 ```
 
 *Tasks:*
-- installDependencies<configuration>
+- installDependencies\<configuration\>
 
 
 Android Projects
@@ -123,7 +130,7 @@ xamarin {
 ```
 
 *Tasks:*
-- build<configuration>
+- build\<configuration\>
 -- buildDebug
 -- buildRelease
 - buildAll
@@ -194,7 +201,7 @@ xamarin {
 ```
 
 *Tasks:*
-- build<configuration>
+- build\<configuration\>
 -- buildDebug
 -- buildRelease
 - buildAll
