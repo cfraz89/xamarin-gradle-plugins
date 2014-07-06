@@ -5,7 +5,7 @@ Plugins to integrate Xamarin mobile apps into gradle and maven.
 There are three plugins currently:
 
 - xamarin-build-plugin: Allows you to build existing Xamarin.Android (compile and apk), Xamarin.iOS, and vanilla Xamarin projects by invoking builds against the .csproj/.sln files.
-  Provides support for fetching dependencies under the 'xamarinCompile' configuration.
+  Provides support for fetching dependencies under the 'references' configuration.
 - xamarin-publish-plugin (optional): Adds configuration and tasks to publish a project configured with the build plugin to maven, eusing the maven-publish plugin.
 
 Using these plugins in tandem will allow you to integrate Maven dependency management into your Xamarin projects for more modular builds.
@@ -28,7 +28,7 @@ buildscript {
     }
 }
 
-apply plugin: 'xamarin-android-plugin'
+apply plugin: 'xamarin-build-plugin'
 apply plugin: 'xamarin-publish-plugin'
 ```
 
@@ -38,11 +38,12 @@ This plugin must be configured with enough information to invoke the xamarin bui
 All configuration for the build plugin is done under the 'xamarin' project extension.
 
 A project block must be specified in the xamarin closure. Available project types are:
-- androidProject
-- iOSProject
-- xbuildProject
-- mdtoolProject
-- genericProject
+- androidAppProject
+- iOSAppProject
+- genericAppProject
+- androidLibraryProject
+- iOSLibraryProject
+- genericLibraryProject
 
 The block can optionally be configured with xbuildPath and mdtoolpath.
 These default to 'xbuild' and '/Applications/Xamarin Studio.app/Contents/MacOS/mdtool' respectively, and will suit standard Xamarin installs.
@@ -60,13 +61,17 @@ xamarin {
 
 Dependencies
 ------------------------------
-The 'xamarinCompile' configuration is added by the build plugin. DLL's which have been packaged as maven artifacts can be used here,
-and will be copied into a 'dependencies' (by default) folder with the 'fetchXamarinDependencies-{configuration}' task, which also runs before build steps.
-
+The 'references' configuration is added by the build plugin. DLL's which have been packaged as maven artifacts can be used here,
+and will be copied into a 'dependencies' (by default) folder with the 'installDependencies<configuration>' task, which also runs before build steps.
+The 'referencesMatched' configuration may also be used, which will use the correct maven classifier for your compiled configuration.
+This is useful when used for library published with the xamarin-publishing-plugin, which published all configurations of a dll under classifiers named after the configuration.
 *Example:*
 ```groovy
 dependencies {
-    xamarinCompile 'au.com.sample.group:SampleComponent:1.0'
+    references 'au.com.sample.group:SampleComponent:1.0'
+
+    //Or use debug dll for Debug configuration, release dll for Release configuration, etc
+    referencesMatched 'au.com.sample.group:SampleComponent:1.0'
 }
 ```
 
@@ -75,15 +80,14 @@ Debug symbols (.dll.mdb) get pushed to maven under the debug-symbols classifier,
 *Example:*
 ```groovy
 dependencies {
-    xamarinCompile 'au.com.sample.group:SampleComponent:1.0'
-    xamarinCompile 'au.com.sample.group:SampleComponent:1.0:debug-symbols@dll.mdb'
+    references 'au.com.sample.group:SampleComponent:1.0:debug@dll'
+    references 'au.com.sample.group:SampleComponent:1.0:debug-symbols@dll.mdb'
 }
 
-Configurations are also added per configuration specified in the project. These configurations exend xamarinCompile. Eg if configurations are 'Debug' and 'Release' - 'xamarinCompileDebug' and 'xamarinCompileRelease' will be available which apply only when building these configurations.
 ```
 
 *Tasks:*
-- fetchXamarinDependencies-{configuration}
+- installDependencies<configuration>
 
 
 Android Projects
@@ -119,9 +123,10 @@ xamarin {
 ```
 
 *Tasks:*
-- xamarinBuild-Debug
-- xamarinBuild-Release
-- xamarinBuildAll
+- build<configuration>
+-- buildDebug
+-- buildRelease
+- buildAll
 
 This should be sufficient for most projects.
 
@@ -151,13 +156,6 @@ xamarin {
     }
 }
 ```
-
-*Tasks:*
-- xamarinBuild-CustomDebugTarget
-- xamarinBuild-CustomReleaseTarget
-- xamarinBuildAll
-
-
 
 iOS Projects
 --------------------------
@@ -196,9 +194,10 @@ xamarin {
 ```
 
 *Tasks:*
-- xamarinBuild-Debug
-- xamarinBuild-Release
-- xamarinBuildAll
+- build<configuration>
+-- buildDebug
+-- buildRelease
+- buildAll
 
 This is very similar to android projects, however instead of just project name, the solution file is required to be provided for mdtool to be able to build the project and its project dependencies.
 For app projects, an ipa will be built if specified in the Xamarin project settings for the built configuration.
@@ -216,19 +215,16 @@ Using the publishing plugin
 The publishing plugin leverages the maven-publish plugin, adding a maven publishing configuration for the project.
 Under this maven configuration, the output dll for each configuration will be added as an artifact, with artifactId equal to to the projectName by default, and other parameters (group, version) pulled from the project properties. The configuration name will be used as the classifier
 If the mdb debug file exists in the specified configuration, it will be published with the 'debug-symbols' classifier. 
-This will add the typical maven publishing tasks. The 'publish' and 'publishToMavenLocal' tasks will be configured to depend on 'xamarinBuildAll', making an easy workflow where libraries can be published with one command.
+This will add the typical maven publishing tasks. The 'publish' and 'publishToMavenLocal' tasks will be configured to depend on 'buildAll', making an easy workflow where libraries can be published with one command.
 
 The project could then be used as a dependency as such:
 ```groovy
 dependencies {
-	//For all configurations
-    xamarinCompile 'artifact.group:artifactid:1.0:release@dll'
+	//For all configurations, use release dll
+    references 'artifact.group:artifactid:1.0:release@dll'
     
-    //Or
-    xamarinCompileDebug 'artifact.group:artifactid:1.0:debug@dll'
-    'artifact.group:artifactid:1.0:debug-symbols@dll.mdb'
-
-    xamarinCompileRelease 'artifact.group:artifactid:1.0:release@dll',
+    //Or use debug dll for Debug configuration, release dll for Release configuration, etc
+    referencesMatched 'artifact.group:artifactid:1.0'
 }
 ```
 

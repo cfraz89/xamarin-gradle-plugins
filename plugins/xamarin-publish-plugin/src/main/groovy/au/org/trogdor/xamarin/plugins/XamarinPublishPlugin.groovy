@@ -22,8 +22,8 @@ class XamarinPublishPlugin implements Plugin<Project> {
                 xamarinProject.configurations.all {configuration->
                     addArtifacts(configuration, publication, projectInternal)
                 }
-                projectInternal.tasks.publishToMavenLocal.dependsOn('xamarinBuildAll')
-                projectInternal.tasks.publish.dependsOn('xamarinBuildAll')
+                projectInternal.tasks.publishToMavenLocal.dependsOn('buildAll')
+                projectInternal.tasks.publish.dependsOn('buildAll')
             }
 
             private void addArtifacts(configuration, publication, projectInternal) {
