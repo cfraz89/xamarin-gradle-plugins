@@ -45,6 +45,9 @@ A project block must be specified in the xamarin closure. Available project type
 - iOSLibraryProject
 - genericLibraryProject
 
+
+Customising tool paths
+------------------------------
 The block can optionally be configured with xbuildPath and mdtoolpath.
 These default to 'xbuild' and '/Applications/Xamarin Studio.app/Contents/MacOS/mdtool' respectively, and will suit standard Xamarin installs.
 
@@ -53,7 +56,7 @@ These default to 'xbuild' and '/Applications/Xamarin Studio.app/Contents/MacOS/m
 xamarin {
     xbuildPath '/usr/local/bin/xbuild'
     mdtoolPath '/usr/local/bin/mdtool'
-    configurations {
+    projectType {
         ...
     }
 }
@@ -62,7 +65,7 @@ xamarin {
 Dependencies
 ------------------------------
 The 'references' configuration is added by the build plugin. DLL's which have been packaged as maven artifacts can be used here,
-and will be copied into a 'dependencies' (by default) folder with the 'installDependencies<configuration>' task, which also runs before build steps.
+and will be copied into a 'dependencies' (by default) folder with the 'installDependencies\<configuration\>' task, which also runs before build steps.
 
 The 'referencesMatched' configuration may also be used, which will use the correct maven classifier for your compiled configuration.
 This is useful when used for library published with the xamarin-publishing-plugin, which published all configurations of a dll under classifiers named after the configuration.
@@ -72,7 +75,7 @@ You can use 'xamarin.referenceProject(projectPath)' to form a transitive depende
 *Example:*
 ```groovy
 dependencies {
-    references 'au.com.sample.group:SampleComponent:1.0'
+    references 'au.com.sample.group:SampleComponent:1.0@dll'
 
     //Or use debug dll for Debug configuration, release dll for Release configuration, etc
     referencesMatched 'au.com.sample.group:SampleComponent:1.0'
@@ -96,7 +99,6 @@ dependencies {
 *Tasks:*
 - installDependencies\<configuration\>
 
-
 Android Projects
 ------------------------------
 Android projects come in two flavors:
@@ -108,10 +110,6 @@ A typical Xamarin Android Application project will be configured like so:
 xamarin {
     androidAppProject {
         projectName 'Project'
-        configurations {
-            Debug
-            Release
-        }
     }
 }
 ```
@@ -121,10 +119,6 @@ A typical Xamarin Android Library project will be configured like so:
 xamarin {
     androidLibraryProject {
         projectName 'Project'
-        configurations {
-            Debug
-            Release
-        }
     }
 }
 ```
@@ -143,6 +137,7 @@ Alternatively you may specify 'projectFile' directly.
 The blocks under configurations {} should match up with the build configurations specified in your Xamarin project.
 For each configuration, you add build targets (build and/or androidPackage), optionally specifying the output file which has ben specified in the Xamarin project.
 However if the projectName is specified, the output file defaults to 'bin/$configuration/$projectName.dll'
+The default configurations include Debug and Release, which will suit most projects which haven't had configurations modified.
 
 dependencyDir can also be specified, and will define where downloaded dependencies get copied into
 
@@ -158,6 +153,10 @@ xamarin {
             }
             CustomReleaseTarget {
                  buildOutput 'bin/CustomReleaseFolder/CustomApp.apk'
+            }
+            CustomSomeOtherTarget
+            CustomAnotherTargetWithCustomOutput {
+                buildOutput 'bin/CustomOther/CustomApp.apk'
             }
         }
     }
@@ -177,10 +176,6 @@ xamarin {
         projectName 'Project'
         solutionFile 'Solution.sln'
         dependencyDir 'libs'
-        configurations {
-            Debug
-            Release
-        }
     }
 }
 ```
@@ -192,10 +187,6 @@ xamarin {
         projectName 'Project'
         solutionFile 'Solution.sln'
         dependencyDir 'libs'
-        configurations {
-            Debug
-            Release
-        }
     }
 }
 ```
