@@ -32,7 +32,7 @@ class DependencyFetchTask extends DefaultTask {
 
     @TaskAction
     def fetch() {
-        /*mConfiguration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
+        mConfiguration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
             def newName = "${artifact.name}.${artifact.extension}"
             println "${xamarinProject.dependencyDir}/${newName}"
             project.copy {
@@ -40,6 +40,6 @@ class DependencyFetchTask extends DefaultTask {
                 into (xamarinProject.dependencyDir)
                 rename { newName }
             }
-        }*/
+        }
     }
 }
