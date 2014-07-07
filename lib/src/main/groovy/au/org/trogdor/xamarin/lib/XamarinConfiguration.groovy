@@ -139,7 +139,7 @@ class iOSAppConfiguration extends XamarinConfiguration {
     protected def resolveBuildOutput(String overrideOutput, String device) {
         String output
         if (!overrideOutput && xPrj.projectName)
-            output = "bin/${device}/${name}/${xPrj.projectName}.dll"
+            output = "bin/${device}/${name}/${xPrj.projectName}.app"
         else
             output = overrideOutput
 
