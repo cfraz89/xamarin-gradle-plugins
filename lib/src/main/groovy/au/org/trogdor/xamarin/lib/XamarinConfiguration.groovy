@@ -102,14 +102,14 @@ class iOSAppConfiguration extends XamarinConfiguration {
             configuration = this
             device = "iPhoneSimulator"
             inputs.dir(sourceFiles)
-            outputs.file(mResolvedIPhoneSimulatorOutput)
+            outputs.dir(mResolvedIPhoneSimulatorOutput)
         }
         def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhone"
             inputs.dir(sourceFiles)
-            outputs.file(mResolvedIPhoneOutput)
+            outputs.dir(mResolvedIPhoneOutput)
         }
 
         def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
