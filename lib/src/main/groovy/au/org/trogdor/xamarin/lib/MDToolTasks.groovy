@@ -37,7 +37,7 @@ class MDToolTask extends DefaultTask {
 
 class MDToolCompileTask extends MDToolTask {
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.projectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
+		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
 	}
 }
 
@@ -53,6 +53,6 @@ class MDToolCleanTask extends MDToolTask {
     }
 
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.projectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
+		[project.xamarin.mdtoolPath, 'build', '-t:Clean', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
 	}
 }

@@ -5,7 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskExecutionException
 
 class XBuildTask extends DefaultTask {
-	XamarinProject xamarinProject
+    XBuildProject xamarinProject
 	XamarinConfiguration configuration
 
 	protected def projectFilePath
@@ -14,20 +14,13 @@ class XBuildTask extends DefaultTask {
 		return []
 	}
 
-    def generateProjectFilePath() {
-        def unresolvedPath = xamarinProject.projectFile
-        if (xamarinProject.getProjectName() && !unresolvedPath)
-            unresolvedPath = xamarinProject.getProjectName() + ".csproj"
-        project.file(unresolvedPath).path
-    }
-
 	@TaskAction
 	def executeTask() {
         executeForConfiguration(configuration)
 	}
 
     def executeForConfiguration(XamarinConfiguration config) {
-        projectFilePath = generateProjectFilePath()
+        projectFilePath = project.file(xamarinProject.projectFile).path
         def proc = generateCommand(config).execute()
         def serr = new ByteArrayOutputStream(4096)
         proc.waitForProcessOutput(System.out, serr)
@@ -38,14 +31,14 @@ class XBuildTask extends DefaultTask {
 
 class XBuildCompileTask extends XBuildTask {
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:Build']
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Build']
 	}
 }
 
 
 class XBuildAndroidPackageTask extends XBuildTask {
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:PackageForAndroid']
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:PackageForAndroid']
 	}
 }
 
@@ -60,6 +53,6 @@ class XBuildCleanTask extends XBuildTask {
     }
 
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", '/t:Clean']
+		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Clean']
 	}
 }

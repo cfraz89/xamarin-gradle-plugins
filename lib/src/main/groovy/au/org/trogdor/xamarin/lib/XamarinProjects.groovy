@@ -4,30 +4,25 @@ import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.Project
 import groovy.transform.InheritConstructors
+import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.tasks.TaskExecutionException
 
 class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 	final Project project
     final NamedDomainObjectCollection<XamarinConfiguration> configurationContainer
+    protected String mDepDir = "dependencies"
+    protected String mSolutionFile
+    private String mProjectFile
+    private String mSourceDir
     private String mProjectName
-    private String mDepDir = "dependencies"
-    private List<String> mReferences
 
 	XamarinProject(Project prj) {
         this.project = prj
         configurationContainer = prj.container(XamarinConfiguration, this)
-        mReferences = []
-    }
-
-    def projectName(String name) {
-        mProjectName = name
-    }
-
-    def getProjectName() {
-        return mProjectName;
     }
 
     XamarinConfiguration create(String name) {
-        return new XamarinConfiguration(name, project, this)
+        new XamarinConfiguration(name, project, this)
     }
 
     def configurations(Closure closure) {
@@ -46,27 +41,69 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
         mDepDir
     }
 
-    def references(String refProjectName) {
-        mReferences.add(refProjectName)
+    def solutionFile(String solutionFile) {
+        mSolutionFile = solutionFile
+        def sFile = project.file(mSolutionFile)
+        if (!sFile.exists())
+            throw new ProjectConfigurationException("Project file location $sFile does not exist!", null)
     }
 
-    def getReferencedProjects() {
-        mReferences
+    def getSolutionFile() {
+        mSolutionFile ?: ''
+    }
+
+    def getSolutionDir() {
+        mSolutionFile ? project.file(mSolutionFile).parent + File.separator : ''
+    }
+
+    def projectFile(String projectFileName) {
+        mProjectFile = projectFileName
+        def pFile = project.file(projectFileName)
+        if (!pFile.exists())
+            throw new ProjectConfigurationException("Project file location $pFile does not exist!", null)
+    }
+
+    def getProjectFile() {
+        if (!mProjectFile)
+            throw new ProjectConfigurationException("Project file must be set!", null)
+        mProjectFile
+    }
+
+    def getProjectDir() {
+        project.file(projectFile).parent + File.separator
+    }
+
+    def getSourceDir() {
+        projectDir
+    }
+
+    def projectName(String projectName) {
+        mProjectName = projectName
+    }
+
+    def getInferredName() {
+        if (!projectFile)
+            throw new ProjectConfigurationException("You need to set a project file!", null)
+
+        def fullName = project.file(projectFile).name
+        def inferredName = fullName.lastIndexOf('.').with {it != -1 ? fullName[0..<it] : fullName}
+        inferredName
+    }
+
+    def getProjectName() {
+        mProjectName
+    }
+
+    def getResolvedProjectName() {
+        if (mProjectName)
+            return mProjectName
+        else
+            return inferredName
     }
 }
 
 @InheritConstructors
 class XBuildProject extends XamarinProject {
-	private String mProjectFile = ''
-
-    def projectFile(String projectFile) {
-        mProjectFile = projectFile
-    }
-
-    def getProjectFile() {
-        return mProjectFile
-    }
-	
 	def buildTask() {
 		return XBuildCompileTask
 	}
@@ -96,16 +133,6 @@ class AndroidAppProject extends XBuildProject {
 
 @InheritConstructors
 class MDToolProject extends XamarinProject {
-	private String mSolutionFile
-
-    def solutionFile(String solutionFile) {
-        mSolutionFile = solutionFile
-    }
-
-    def getSolutionFile() {
-        return mSolutionFile
-    }
-
 	def buildTask() {
 		return MDToolCompileTask
 	}

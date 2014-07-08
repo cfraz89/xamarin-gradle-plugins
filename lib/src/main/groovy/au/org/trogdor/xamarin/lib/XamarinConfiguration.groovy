@@ -2,6 +2,7 @@ package au.org.trogdor.xamarin.lib
 
 import groovy.transform.InheritConstructors
 import org.gradle.api.Project
+import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.Task
 
 /**
@@ -21,20 +22,22 @@ class XamarinConfiguration {
     def makeTasks()
     {}
 
-    protected setupTaskDependenciesFromProjectDependencies(Task task) {
-        xPrj.referencedProjects.each { dependencyProjectName ->
-            def dependencyProject = project.findProject(dependencyProjectName)
-            def dependencyTask = dependencyProject.tasks.findByName(task.name)
-            if (dependencyTask) {
-                task.dependsOn(dependencyTask)
-            }
-        }
+    def getSourceFiles()
+    {
+        project.fileTree(dir:xPrj.sourceDir, include: ['**/*.cs',
+                                                       '**/*.csproj',
+                                                       '**/*.xml',
+                                                       '**/*.axml',
+                                                       '**/*.xib',
+                                                       '**/*.storyboard',
+                                                       '**/*.png',
+                                                       '**/*.jpg',
+                                                       '**/*.jpeg']).files
     }
 }
 
 class XamarinSingleBuildConfiguration extends XamarinConfiguration {
     protected String mBuildOutput
-    protected String mResolvedBuildOutput
     protected String buildExtension
 
     def XamarinSingleBuildConfiguration(String name, Project project, XamarinProject xamarinProject) {
@@ -42,33 +45,20 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
         buildExtension = "dll"
     }
 
-    protected def resolveBuildOutput(String overrideOutput) {
-        String output
-        if (!overrideOutput && xPrj.projectName)
-            output = "bin/${name}/${xPrj.projectName}.${buildExtension}"
-        else
-            output = overrideOutput
-
-        return output
-    }
-
-    protected def setTaskOutput(Task task, String output) {
-        if (output) {
-            task.outputs.file(output)
-            task.outputs.upToDateWhen() { false }
-        }
+    protected def getResolvedBuildOutput(String overrideOutput) {
+        overrideOutput ?:  "${xPrj.projectDir}/bin/$name/${xPrj.resolvedProjectName}.$buildExtension"
     }
 
     def makeTasks() {
         def taskName = "build${name}"
+        def buildOutput = getResolvedBuildOutput()
         def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
+            inputs.files(sourceFiles)
+            outputs.file(buildOutput)
         }
         project.tasks.buildAll.dependsOn(task)
-        setTaskOutput(task, resolvedBuildOutput)
-        setupTaskDependenciesFromProjectDependencies(task)
-
     }
 
     def setBuildOutput(String fileName) {
@@ -77,12 +67,6 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
 
     def buildOutput(String fileName) {
         mBuildOutput = fileName
-    }
-
-    def getResolvedBuildOutput() {
-        if (!mResolvedBuildOutput)
-            mResolvedBuildOutput = resolveBuildOutput(mBuildOutput)
-        mResolvedBuildOutput
     }
 }
 
@@ -106,55 +90,39 @@ class iOSAppConfiguration extends XamarinConfiguration {
     private String mIPhoneSimulatorOutput
     private String mIPhoneOutput
 
-    private String resolvedIPhoneSimulatorOutput
-    private String resolvedIPhoneOutput
+    private String mResolvedIPhoneSimulatorOutput
+    private String mResolvedIPhoneOutput
 
     def makeTasks() {
-        resolvedIPhoneSimulatorOutput = resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
-        resolvedIPhoneOutput = resolveBuildOutput(mIPhoneOutput, 'iPhone')
+        mResolvedIPhoneSimulatorOutput = resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
+        mResolvedIPhoneOutput = resolveBuildOutput(mIPhoneOutput, 'iPhone')
 
         def iPhoneSimulatorTask = project.task("build${name}iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhoneSimulator"
+            inputs.dir(sourceFiles)
+            outputs.file(mResolvedIPhoneSimulatorOutput)
         }
         def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhone"
+            inputs.dir(sourceFiles)
+            outputs.file(mResolvedIPhoneOutput)
         }
-        setTaskOutput(iPhoneSimulatorTask, resolvedIPhoneSimulatorOutput)
-        setTaskOutput(iPhoneTask, resolvedIPhoneOutput)
-
-        setupTaskDependenciesFromProjectDependencies(iPhoneSimulatorTask)
-        setupTaskDependenciesFromProjectDependencies(iPhoneTask)
 
         def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
         project.tasks.buildAll.dependsOn(buildTask)
 
-        setupTaskDependenciesFromProjectDependencies(buildTask)
-
     }
 
     protected def resolveBuildOutput(String overrideOutput, String device) {
-        String output
-        if (!overrideOutput && xPrj.projectName)
-            output = "bin/${device}/${name}/${xPrj.projectName}.app"
-        else
-            output = overrideOutput
-
-        return output
-    }
-
-    protected def setTaskOutput(Task task, String output) {
-        if (output) {
-            task.outputs.file(output)
-            task.outputs.upToDateWhen() { false }
-        }
+        overrideOutput ?: "${xPrj.projectDir}/bin/$device/$name/${xPrj.resolvedProjectName}.app"
     }
 
     def getResolvedIPhoneSimulatorBuildOutput() {
-        resolvedIPhoneSimulatorOutput
+        mResolvedIPhoneSimulatorOutput
     }
 
     def setIPhoneSimulatorBuildOutput(String output) {
@@ -166,7 +134,7 @@ class iOSAppConfiguration extends XamarinConfiguration {
     }
 
     def getResolvedIPhoneBuildOutput() {
-        resolvedIPhoneOutput
+        mResolvedIPhoneOutput
     }
 
     def setIPhoneBuildOutput(String output) {
