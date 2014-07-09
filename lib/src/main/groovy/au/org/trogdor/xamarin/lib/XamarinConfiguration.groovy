@@ -32,7 +32,8 @@ class XamarinConfiguration {
                                                        '**/*.storyboard',
                                                        '**/*.png',
                                                        '**/*.jpg',
-                                                       '**/*.jpeg']).files
+                                                       '**/*.jpeg'],
+        exclude: ['**/bin/**', '**/obj/**']).files
     }
 }
 

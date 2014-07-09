@@ -36,6 +36,12 @@ class MDToolTask extends DefaultTask {
 }
 
 class MDToolCompileTask extends MDToolTask {
+    def MDToolCompileTask() {
+        super()
+        onlyIf {
+            !project.hasProperty('ide')
+        }
+    }
 	def generateCommand(XamarinConfiguration config) {
 		[project.xamarin.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
 	}
