@@ -35,6 +35,12 @@ class XamarinConfiguration {
                                                        '**/*.jpeg'],
         exclude: ['**/bin/**', '**/obj/**']).files
     }
+
+    def dependOnReferences(Task task) {
+        project.dependencies.xamarin.references.each {
+            task.dependsOn("$it:build$name")
+        }
+    }
 }
 
 class XamarinSingleBuildConfiguration extends XamarinConfiguration {
@@ -46,13 +52,17 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
         buildExtension = "dll"
     }
 
-    protected def getResolvedBuildOutput(String overrideOutput) {
+    protected def resolveBuildOutput(String overrideOutput) {
         overrideOutput ?:  "${xPrj.projectDir}/bin/$name/${xPrj.resolvedProjectName}.$buildExtension"
+    }
+
+    def getResolvedBuildOutput() {
+        resolveBuildOutput(null)
     }
 
     def makeTasks() {
         def taskName = "build${name}"
-        def buildOutput = getResolvedBuildOutput()
+        def buildOutput = resolveBuildOutput(mBuildOutput)
         def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
@@ -60,6 +70,7 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
             outputs.file(buildOutput)
         }
         project.tasks.buildAll.dependsOn(task)
+        dependOnReferences(task)
     }
 
     def setBuildOutput(String fileName) {
@@ -115,7 +126,8 @@ class iOSAppConfiguration extends XamarinConfiguration {
 
         def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
         project.tasks.buildAll.dependsOn(buildTask)
-
+        dependOnReferences(iPhoneSimulatorTask)
+        dependOnReferences(iPhoneTask)
     }
 
     protected def resolveBuildOutput(String overrideOutput, String device) {

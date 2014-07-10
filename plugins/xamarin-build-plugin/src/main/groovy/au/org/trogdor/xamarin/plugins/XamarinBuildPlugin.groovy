@@ -3,11 +3,11 @@ package au.org.trogdor.xamarin.plugins
 import au.org.trogdor.xamarin.lib.XamarinConfiguration
 import au.org.trogdor.xamarin.lib.DependencyFetchTask
 import au.org.trogdor.xamarin.lib.XamarinProject
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.tasks.Copy
 
 class XamarinBuildPlugin implements Plugin<Project> {
     public static String EXTENSION_NAME = "xamarin"
@@ -74,10 +74,10 @@ class XamarinBuildPlugin implements Plugin<Project> {
     def makeDependencyTask(Project project, XamarinConfiguration xConf) {
         def config = project.configurations.findByName(CONFIG_BASE_NAME + xConf.name)
         def taskName = TASK_INSTALL_DEPENDENCIES_NAME + xConf.name
+        def depDir = project.xamarin.xamarinProject.dependencyDir
         project.task(taskName, description: "Copy dependency dlls into project", group: TASK_GROUP, type: DependencyFetchTask) {
             xamarinProject = project.xamarin.xamarinProject
             configuration = config
         }
-
     }
 }

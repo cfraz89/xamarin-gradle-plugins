@@ -14,12 +14,8 @@ class DependencyFetchTask extends DefaultTask {
 
     def setConfiguration(Configuration c) {
         mConfiguration = c
-
         inputs.source(mConfiguration)
         outputs.dir(xProj.dependencyDir)
-        outputs.upToDateWhen {
-            false
-        }
     }
 
     def setXamarinProject(XamarinProject xp) {
@@ -30,14 +26,18 @@ class DependencyFetchTask extends DefaultTask {
         this.xProj
     }
 
+    def getConfiguration() {
+        mConfiguration
+    }
+
     @TaskAction
     def fetch() {
-        mConfiguration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
+        configuration.resolvedConfiguration.resolvedArtifacts.each() {artifact->
             def newName = "${artifact.name}.${artifact.extension}"
             println "${xamarinProject.dependencyDir}/${newName}"
             project.copy {
                 from artifact.file
-                into (xamarinProject.dependencyDir)
+                into xamarinProject.dependencyDir
                 rename { newName }
             }
         }

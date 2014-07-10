@@ -15,7 +15,7 @@ class XamarinPublishPlugin implements Plugin<Project> {
             @java.lang.Override
             void execute(ProjectInternal projectInternal) {
                 XamarinProject xamarinProject = projectInternal.xamarin.xamarinProject
-                def resolvedArtifactId = projectInternal.xamarinPublish.artifactId ?: xamarinProject.projectName
+                def resolvedArtifactId = projectInternal.xamarinPublish.artifactId ?: xamarinProject.resolvedProjectName
 
                 MavenPublication publication = projectInternal.publishing.publications.create('xamarin', MavenPublication)
                 publication.artifactId = resolvedArtifactId
@@ -28,19 +28,20 @@ class XamarinPublishPlugin implements Plugin<Project> {
 
             private void addArtifacts(configuration, publication, projectInternal) {
                 def classifierName = configuration.name.toLowerCase()
-                def buildOutput = configuration.resolvedBuildOutput
-                if (projectInternal.file(buildOutput).exists())
-                    publication.artifact(buildOutput) {
-                        extension "dll"
-                        classifier classifierName
-                    }
+                configuration.resolvedBuildOutput.with {
+                    if (projectInternal.file(it).exists())
+                        publication.artifact(it) {
+                            extension "dll"
+                            classifier classifierName
+                        }
 
-                def symbolsPath = buildOutput + ".mdb"
-                if (projectInternal.file(symbolsPath).exists())
-                    publication.artifact(symbolsPath) {
-                        extension "dll.mdb"
-                        classifier "$classifierName-symbols"
-                    }
+                    def symbolsPath = "${it}.mdb"
+                    if (projectInternal.file(symbolsPath).exists())
+                        publication.artifact(symbolsPath) {
+                            extension "dll.mdb"
+                            classifier "$classifierName-symbols"
+                        }
+                }
             }
         })
     }

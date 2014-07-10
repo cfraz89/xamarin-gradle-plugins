@@ -43,9 +43,6 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 
     def solutionFile(String solutionFile) {
         mSolutionFile = solutionFile
-        def sFile = project.file(mSolutionFile)
-        if (!sFile.exists())
-            throw new ProjectConfigurationException("Project file location $sFile does not exist!", null)
     }
 
     def getSolutionFile() {
@@ -58,9 +55,6 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 
     def projectFile(String projectFileName) {
         mProjectFile = projectFileName
-        def pFile = project.file(projectFileName)
-        if (!pFile.exists())
-            throw new ProjectConfigurationException("Project file location $pFile does not exist!", null)
     }
 
     def getProjectFile() {
@@ -82,9 +76,6 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
     }
 
     def getInferredName() {
-        if (!projectFile)
-            throw new ProjectConfigurationException("You need to set a project file!", null)
-
         def fullName = project.file(projectFile).name
         def inferredName = fullName.lastIndexOf('.').with {it != -1 ? fullName[0..<it] : fullName}
         inferredName
