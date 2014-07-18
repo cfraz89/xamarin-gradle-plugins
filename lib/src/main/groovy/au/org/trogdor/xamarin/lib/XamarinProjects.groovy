@@ -15,6 +15,7 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
     private String mProjectFile
     private String mSourceDir
     private String mProjectName
+    private Boolean mRestoreNuget
 
 	XamarinProject(Project prj) {
         this.project = prj
@@ -46,11 +47,13 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
     }
 
     def getSolutionFile() {
-        mSolutionFile ?: ''
+        if (!mSolutionFile)
+            throw new ProjectConfigurationException("Solution file must be set!", null)
+        mSolutionFile
     }
 
     def getSolutionDir() {
-        mSolutionFile ? project.file(mSolutionFile).parent + File.separator : ''
+        project.file(solutionFile).parent + File.separator
     }
 
     def projectFile(String projectFileName) {
@@ -90,6 +93,14 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
             return mProjectName
         else
             return inferredName
+    }
+
+    def restoreNuget(Boolean restore) {
+        mRestoreNuget = restore
+    }
+
+    def getRestoreNuget() {
+        mRestoreNuget
     }
 }
 

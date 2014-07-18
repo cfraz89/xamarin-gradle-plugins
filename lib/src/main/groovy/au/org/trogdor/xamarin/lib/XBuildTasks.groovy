@@ -21,7 +21,7 @@ class XBuildTask extends DefaultTask {
 	}
 
     def executeForConfiguration(XamarinConfiguration config) {
-        project.file(xamarinProject.projectFile).with {
+        project.files(xamarinProject.projectFile, xamarinProject.solutionFile).each {
             if (!it.exists())
                 throw new ProjectConfigurationException("Project file location $it does not exist!", null)
         }
@@ -37,14 +37,14 @@ class XBuildTask extends DefaultTask {
 
 class XBuildCompileTask extends XBuildTask {
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Build']
+		[project.xamarin.paths.xbuild, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Build']
 	}
 }
 
 
 class XBuildAndroidPackageTask extends XBuildTask {
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:PackageForAndroid']
+		[project.xamarin.paths.xbuild, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:PackageForAndroid']
 	}
 }
 
@@ -59,6 +59,6 @@ class XBuildCleanTask extends XBuildTask {
     }
 
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.xbuildPath, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Clean']
+		[project.xamarin.paths.xbuild, projectFilePath, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Clean']
 	}
 }

@@ -5,6 +5,7 @@ import au.org.trogdor.xamarin.lib.AndroidLibraryProject
 import au.org.trogdor.xamarin.lib.GenericAppProject
 import au.org.trogdor.xamarin.lib.GenericLibraryProject
 import au.org.trogdor.xamarin.lib.MDToolProject
+import au.org.trogdor.xamarin.lib.PathContainer
 import au.org.trogdor.xamarin.lib.XBuildProject
 import au.org.trogdor.xamarin.lib.XamarinProject
 import au.org.trogdor.xamarin.lib.iOSAppProject
@@ -15,14 +16,14 @@ import org.gradle.api.Project
  * Created by chrisfraser on 7/07/2014.
  */
 class XamarinBuildExtension {
+
     private def Project project
     private def XamarinProject mXamarinProject
-
-    private String mXBuildPath = "xbuild"
-    private String mMDToolPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool"
+    private def PathContainer mPaths
 
     XamarinBuildExtension(Project prj) {
         project = prj
+        mPaths = new PathContainer()
     }
 
     private def setProject(XamarinProject xprj, Closure closure) {
@@ -37,20 +38,12 @@ class XamarinBuildExtension {
         mXamarinProject
     }
 
-    def xbuildPath(String xbuildPath) {
-        mXBuildPath = xbuildPath
+    def paths(Closure closure) {
+        project.configure(mPaths, closure)
     }
 
-    def getXbuildPath() {
-        return mXBuildPath
-    }
-
-    def mdtoolPath(String mdtoolpath) {
-        mMDToolPath = mdtoolpath
-    }
-
-    def getMdtoolPath() {
-        return mMDToolPath
+    def getPaths() {
+        mPaths
     }
 
     def androidAppProject(Closure closure) {

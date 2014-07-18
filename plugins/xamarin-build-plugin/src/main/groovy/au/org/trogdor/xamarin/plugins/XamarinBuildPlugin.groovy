@@ -1,5 +1,6 @@
 package au.org.trogdor.xamarin.plugins
 
+import au.org.trogdor.xamarin.lib.NugetRestoreTask
 import au.org.trogdor.xamarin.lib.XamarinConfiguration
 import au.org.trogdor.xamarin.lib.DependencyFetchTask
 import au.org.trogdor.xamarin.lib.XamarinProject
@@ -16,6 +17,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
     public static String TASK_BUILD_ALL_NAME = "buildAll"
     public static String TASK_CLEAN_NAME = "clean"
     public static String TASK_INSTALL_DEPENDENCIES_NAME = "installDependencies"
+    public static String TASK_RESTORE_NUGET_NAME = "restoreNugetPackages"
     public static String TASK_GROUP = "Xamarin"
 
 	void apply(Project project) {
@@ -30,6 +32,10 @@ class XamarinBuildPlugin implements Plugin<Project> {
                 if (xamarin.xamarinProject) {
                     task(TASK_BUILD_ALL_NAME, description: "Build all configurations", group: TASK_GROUP)
                     task(TASK_CLEAN_NAME, description: "Clean the Xamarin project", group: TASK_GROUP, type: xamarin.xamarinProject.cleanTask()) {
+                        xamarinProject = xamarin.xamarinProject
+                    }
+                    task(TASK_RESTORE_NUGET_NAME, description: "Download nuget packages into project", group: TASK_GROUP, type: NugetRestoreTask) {
+                        paths = xamarin.paths
                         xamarinProject = xamarin.xamarinProject
                     }
 
@@ -75,7 +81,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
         def config = project.configurations.findByName(CONFIG_BASE_NAME + xConf.name)
         def taskName = TASK_INSTALL_DEPENDENCIES_NAME + xConf.name
         def depDir = project.xamarin.xamarinProject.dependencyDir
-        project.task(taskName, description: "Copy dependency dlls into project", group: TASK_GROUP, type: DependencyFetchTask) {
+        project.task(taskName, description: "Copy dependency dlls into project", group: TASK_GROUP, type: DependencyFetchTask, dependsOn: TASK_RESTORE_NUGET_NAME) {
             xamarinProject = project.xamarin.xamarinProject
             configuration = config
         }
