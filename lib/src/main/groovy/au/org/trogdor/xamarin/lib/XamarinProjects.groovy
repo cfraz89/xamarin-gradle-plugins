@@ -11,14 +11,15 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 	final Project project
     final NamedDomainObjectCollection<XamarinConfiguration> configurationContainer
     protected String mDepDir = "dependencies"
-    protected String mSolutionFile
+    protected Project mSolutionProject
     private String mProjectFile
     private String mSourceDir
     private String mProjectName
     private Boolean mRestoreNuget
 
 	XamarinProject(Project prj) {
-        this.project = prj
+        project = prj
+        mSolutionProject = project.rootProject
         configurationContainer = prj.container(XamarinConfiguration, this)
     }
 
@@ -42,18 +43,27 @@ class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
         mDepDir
     }
 
-    def solutionFile(String solutionFile) {
-        mSolutionFile = solutionFile
+    def solutionProject(Project solutionProject) {
+        mSolutionProject = solutionProject
+    }
+
+    def solutionProject(String solutionProjectName) {
+        mSolutionProject = project.findProject(solutionProjectName)
+    }
+
+    def getSolutionProject() {
+        mSolutionProject
     }
 
     def getSolutionFile() {
-        if (!mSolutionFile)
-            throw new ProjectConfigurationException("Solution file must be set!", null)
-        mSolutionFile
+        def slnFile = solutionProject.xamarin.solution
+        if (!slnFile)
+            throw new ProjectConfigurationException("Solution project needs solution file to be set!", null)
+        solutionProject.file(slnFile).path
     }
 
     def getSolutionDir() {
-        project.file(solutionFile).parent + File.separator
+        solutionProject.file(solutionFile).parent + File.separator
     }
 
     def projectFile(String projectFileName) {
@@ -170,5 +180,12 @@ class GenericLibraryProject extends XBuildProject {
 class GenericAppProject extends XBuildProject {
     XamarinConfiguration create(String name) {
         return new GenericAppConfiguration(name, project, this)
+    }
+}
+
+@InheritConstructors
+class NUnitProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new NUnitConfiguration(name, project, this)
     }
 }

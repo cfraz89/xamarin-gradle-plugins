@@ -5,6 +5,7 @@ import au.org.trogdor.xamarin.lib.AndroidLibraryProject
 import au.org.trogdor.xamarin.lib.GenericAppProject
 import au.org.trogdor.xamarin.lib.GenericLibraryProject
 import au.org.trogdor.xamarin.lib.MDToolProject
+import au.org.trogdor.xamarin.lib.NUnitProject
 import au.org.trogdor.xamarin.lib.PathContainer
 import au.org.trogdor.xamarin.lib.XBuildProject
 import au.org.trogdor.xamarin.lib.XamarinProject
@@ -17,9 +18,10 @@ import org.gradle.api.Project
  */
 class XamarinBuildExtension {
 
-    private def Project project
-    private def XamarinProject mXamarinProject
-    private def PathContainer mPaths
+    private Project project
+    private XamarinProject mXamarinProject
+    private PathContainer mPaths
+    private String mSolutionFile
 
     XamarinBuildExtension(Project prj) {
         project = prj
@@ -44,6 +46,14 @@ class XamarinBuildExtension {
 
     def getPaths() {
         mPaths
+    }
+
+    def solution(String name) {
+        mSolutionFile = name
+    }
+
+    def getSolution() {
+        mSolutionFile
     }
 
     def androidAppProject(Closure closure) {
@@ -76,5 +86,9 @@ class XamarinBuildExtension {
 
     def mdtoolProject(Closure closure) {
         setProject(new MDToolProject(project), closure)
+    }
+
+    def nunitProject(Closure closure) {
+        setProject(new NUnitProject(project), closure)
     }
 }

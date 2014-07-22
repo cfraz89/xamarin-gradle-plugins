@@ -10,8 +10,6 @@ class MDToolTask extends DefaultTask {
     XamarinConfiguration configuration
     String device
 
-	protected def solutionFilePath
-
 	def generateCommand() {
 		return []
 	}
@@ -27,17 +25,13 @@ class MDToolTask extends DefaultTask {
 
     def executeForConfiguration(XamarinConfiguration config) {
         project.files(xamarinProject.projectFile, xamarinProject.solutionFile).each {
-            if (!it.exists())
+            if (!it.exists()) {
                 throw new ProjectConfigurationException("Project file location $it does not exist!", null)
+                return
+            }
         }
 
-        solutionFilePath = project.file(xamarinProject.solutionFile).path
-        def proc = generateCommand(config).execute()
-        def serr = new ByteArrayOutputStream(4096)
-        proc.waitForProcessOutput(System.out, serr)
-
-        if(proc.exitValue())
-            throw new TaskExecutionException(this, null)
+        project.exec { commandLine generateCommand(config) }
     }
 }
 
@@ -49,7 +43,7 @@ class MDToolCompileTask extends MDToolTask {
         }
     }
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.paths.mdtoolPath, 'build', '-t:Build', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
+		[project.xamarin.paths.mdtool, 'build', '-t:Build', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", xamarinProject.solutionFile]
 	}
 }
 
@@ -65,6 +59,6 @@ class MDToolCleanTask extends MDToolTask {
     }
 
 	def generateCommand(XamarinConfiguration config) {
-		[project.xamarin.paths.mdtool, 'build', '-t:Clean', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", solutionFilePath]
+		[project.xamarin.paths.mdtool, 'build', '-t:Clean', "-p:${xamarinProject.resolvedProjectName}", "-c:${config.name}${deviceTag}", xamarinProject.solutionFile]
 	}
 }

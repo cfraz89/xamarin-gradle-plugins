@@ -9,6 +9,7 @@ import org.gradle.api.Task
  * Created by chrisfraser on 30/05/2014.
  */
 class XamarinConfiguration {
+    static String RESTORE_TASK_NAME = "restore"
     final String name
     final Project project
     final XamarinProject xPrj
@@ -57,17 +58,16 @@ class XamarinSingleBuildConfiguration extends XamarinConfiguration {
     }
 
     def getResolvedBuildOutput() {
-        resolveBuildOutput(null)
+        resolveBuildOutput(mBuildOutput)
     }
 
     def makeTasks() {
         def taskName = "build${name}"
-        def buildOutput = resolveBuildOutput(mBuildOutput)
-        def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
+        def task = project.task(taskName, description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: "restore${name}", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             inputs.files(sourceFiles)
-            outputs.file(buildOutput)
+            outputs.file(resolvedBuildOutput)
         }
         project.tasks.buildAll.dependsOn(task)
         dependOnReferences(task)
@@ -102,26 +102,21 @@ class iOSAppConfiguration extends XamarinConfiguration {
     private String mIPhoneSimulatorOutput
     private String mIPhoneOutput
 
-    private String mResolvedIPhoneSimulatorOutput
-    private String mResolvedIPhoneOutput
 
     def makeTasks() {
-        mResolvedIPhoneSimulatorOutput = resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
-        mResolvedIPhoneOutput = resolveBuildOutput(mIPhoneOutput, 'iPhone')
-
-        def iPhoneSimulatorTask = project.task("build${name}iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
+        def iPhoneSimulatorTask = project.task("build${name}iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhoneSimulator"
             inputs.dir(sourceFiles)
-            outputs.dir(mResolvedIPhoneSimulatorOutput)
+            outputs.dir(resolvedIPhoneSimulatorBuildOutput)
         }
-        def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "installDependencies${name}", type: xPrj.buildTask()) {
+        def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
             device = "iPhone"
             inputs.dir(sourceFiles)
-            outputs.dir(mResolvedIPhoneOutput)
+            outputs.dir(resolvedIPhoneBuildOutput)
         }
 
         def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
@@ -135,7 +130,7 @@ class iOSAppConfiguration extends XamarinConfiguration {
     }
 
     def getResolvedIPhoneSimulatorBuildOutput() {
-        mResolvedIPhoneSimulatorOutput
+        resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
     }
 
     def setIPhoneSimulatorBuildOutput(String output) {
@@ -147,7 +142,7 @@ class iOSAppConfiguration extends XamarinConfiguration {
     }
 
     def getResolvedIPhoneBuildOutput() {
-        mResolvedIPhoneOutput
+        resolveBuildOutput(mIPhoneOutput, 'iPhone')
     }
 
     def setIPhoneBuildOutput(String output) {
@@ -171,3 +166,14 @@ class GenericAppConfiguration extends XamarinSingleBuildConfiguration {
     }
 }
 
+@InheritConstructors
+class NUnitConfiguration extends XamarinSingleBuildConfiguration {
+    def makeTasks() {
+        super.makeTasks()
+        def task = project.task("test$name", description: "Run a Xamarin nunit project built with configuration $name, using nunit-console", group: "Xamarin", dependsOn: "build$name", type: NUnitConsoleTask) {
+            xamarinProject = xPrj
+            paths = project.xamarin.paths
+            configuration = this
+        }
+    }
+}

@@ -16,7 +16,6 @@ class DependencyFetchTask extends DefaultTask {
         mConfiguration = c
         inputs.source(mConfiguration)
         outputs.dir(xProj.dependencyDir)
-        outputs.upToDateWhen { false }
     }
 
     def setXamarinProject(XamarinProject xp) {
