@@ -1,9 +1,7 @@
 package au.org.trogdor.xamarin.lib.nuget
 
 import au.org.trogdor.xamarin.lib.PathContainer
-import au.org.trogdor.xamarin.lib.XamarinProject
 import org.gradle.api.DefaultTask
-import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -33,8 +31,10 @@ class FetchNugetTask extends DefaultTask {
     @TaskAction
     def fetch() {
         println 'No nuget in solution, downloading...'
+        def nugetFile = project.file(getResolvedNugetPath())
+        nugetFile.parentFile.mkdirs()
         new URL(NUGET_EXE_URL).withInputStream { i ->
-            project.file(resolvedNugetPath).withOutputStream { it << i }
+            nugetFile.withOutputStream { it << i }
         }
     }
 }

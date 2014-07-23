@@ -110,8 +110,9 @@ class XamarinBuildPlugin implements Plugin<Project> {
             xamarinProject = project.xamarin.xamarinProject
             configuration = config
         }
-        project.xamarin.xamarinProject.solutionProject.tasks.with {
-            project.task("$TASK_RESTORE_NAME$xConf.name", description: "Restore all project dependencies for $xConf.name", group: TASK_GROUP_DEPENDENCIES, dependsOn: [installDependencies, it.findByName(TASK_RESTORE_NUGET_NAME), it.findByName(TASK_RESTORE_COMPONENTS_NAME)])
+        project.xamarin.xamarinProject.solutionProject.with {
+            project.evaluationDependsOn(it.path)
+            project.task("$TASK_RESTORE_NAME$xConf.name", description: "Restore all project dependencies for $xConf.name", group: TASK_GROUP_DEPENDENCIES, dependsOn: [installDependencies, tasks.findByName(TASK_RESTORE_NUGET_NAME), tasks.findByName(TASK_RESTORE_COMPONENTS_NAME)])
         }
     }
 }

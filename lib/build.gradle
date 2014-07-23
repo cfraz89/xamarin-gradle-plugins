@@ -1,14 +1,13 @@
-version = 0.2
+version = 0.201
 ext.artifactId = 'lib'
 
 apply plugin: 'groovy'
+apply plugin: 'maven'
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 }
-
-apply plugin: 'maven'
 
 configurations {
 	includeInJar
