@@ -177,3 +177,15 @@ class NUnitConfiguration extends XamarinSingleBuildConfiguration {
         }
     }
 }
+
+@InheritConstructors
+class XUnitConfiguration extends XamarinSingleBuildConfiguration {
+    def makeTasks() {
+        super.makeTasks()
+        def task = project.task("test$name", description: "Run a Xamarin xunit.net project built with configuration $name, using xunit-console", group: "Xamarin", dependsOn: "build$name", type: XUnitConsoleTask) {
+            xamarinProject = xPrj
+            paths = project.xamarin.paths
+            configuration = this
+        }
+    }
+}

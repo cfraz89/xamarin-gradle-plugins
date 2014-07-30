@@ -1,61 +1,60 @@
 package au.org.trogdor.xamarin.lib
 
+import org.gradle.api.Project
+
 /**
  * Created by chrisfraser on 17/07/2014.
  */
 class PathContainer {
-    String mXBuildPath = 'xbuild'
-    String mMDToolPath = '/Applications/Xamarin Studio.app/Contents/MacOS/mdtool'
-    String mMonoPath = 'mono'
-    String mNugetPath
-    String mXamarinComopnentPath
-    String mNunitConsolePath = 'nunit-console'
+    static String DEFAULT_NUGET_RELATIVE_PATH = '.nuget/nuget.exe'
+    static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component'
 
-    def xbuild(String xbuildPath) {
-        mXBuildPath = xbuildPath
+    Project project
+
+    def xbuild = 'xbuild'
+    def mdtool = '/Applications/Xamarin Studio.app/Contents/MacOS/mdtool'
+    def mono =  'mono'
+    def nuget = "${->solutionPath}/${->DEFAULT_NUGET_RELATIVE_PATH}"
+    def xamarinComponent = "${->solutionPath}/${->DEFAULT_XC_RELATIVE_PATH}"
+    def nunitConsole = 'nunit-console'
+    def xunitConsole = 'xunit-console'
+
+    def PathContainer(Project project) {
+        this.project = project
     }
 
-    def mdtool(String mdtoolPath) {
-        mMDToolPath = mdtoolPath
+    def xbuild(def xbuildPath) {
+        xbuild = xbuildPath
     }
 
-    def mono(String monoPath) {
-        mMonoPath = monoPath
+    def mdtool(def mdtoolPath) {
+        mdtool = mdtoolPath
     }
 
-    def nuget(String nugetPath) {
-        mNugetPath = nugetPath
+    def mono(def monoPath) {
+        mono = monoPath
     }
 
-    def xamarinComponent(String xcPath) {
-        mXamarinComopnentPath = xcPath
+    def nuget(def nugetPath) {
+        nuget = nugetPath
     }
 
-    def nunitConsole(String nunitConsolePath) {
-        mNunitConsolePath = nunitConsolePath
+    def xamarinComponent(def xcPath) {
+        xamarinComponent = xcPath
     }
 
-    def getXbuild() {
-        mXBuildPath
+    def nunitConsole(def nunitConsolePath) {
+        nunitConsole = nunitConsolePath
     }
 
-    def getMdtool() {
-        mMDToolPath
+    def xunitConsole(def xunitConsolePath) {
+        xunitConsole = xunitConsolePath
     }
 
-    def getMono() {
-        mMonoPath
-    }
-
-    def getNuget() {
-        mNugetPath
-    }
-
-    def getXamarinComponent() {
-        mXamarinComopnentPath
-    }
-
-    def getNunitConsole() {
-        mNunitConsolePath
+    def getSolutionPath() {
+        if (project.xamarin.solution)
+            project.file(project.xamarin.solution).parent
+        else
+            project.file(project.xamarin.xamarinProject.solutionFile).parent
     }
 }

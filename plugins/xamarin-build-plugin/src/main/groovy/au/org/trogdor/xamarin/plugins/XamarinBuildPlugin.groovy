@@ -41,7 +41,6 @@ class XamarinBuildPlugin implements Plugin<Project> {
                 if (xamarin.solution) {
                     task(TASK_FETCH_NUGET_NAME, description: "Fetch the nuget tool", group: TASK_GROUP_SUPPORT, type: FetchNugetTask) {
                         paths = xamarin.paths
-                        solution = xamarin.solution
                     }
                     task(TASK_RESTORE_NUGET_NAME, description: "Restore nuget packages into project", group: TASK_GROUP_DEPENDENCIES, dependsOn: TASK_FETCH_NUGET_NAME, type: NugetRestoreTask) {
                         paths = xamarin.paths
@@ -49,7 +48,6 @@ class XamarinBuildPlugin implements Plugin<Project> {
                     }
                     task(TASK_FETCH_XPKG_NAME, description: "Fetch the xpkg tool for restoring components", group: TASK_GROUP_SUPPORT, type: FetchXpkgTask) {
                         paths = xamarin.paths
-                        solution = xamarin.solution
                     }
                     task(TASK_RESTORE_COMPONENTS_NAME, description: "Restore Xamarin Components into project", group: TASK_GROUP_DEPENDENCIES, dependsOn: TASK_FETCH_XPKG_NAME, type: ComponentRestoreTask) {
                         paths = xamarin.paths

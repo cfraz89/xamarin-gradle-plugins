@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskAction
  * Created by chrisfraser on 3/06/2014.
  */
 class ComponentRestoreTask extends DefaultTask {
-    static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component'
     static String COMPONENTS_DIR = 'Components'
 
     static String XC_RESTORE_COMMAND = 'restore'
@@ -29,10 +28,6 @@ class ComponentRestoreTask extends DefaultTask {
         project.file(solutionFile).parent
     }
 
-    def getResolvedXCPath() {
-        paths.xamarinComponent ?: "$solutionDir/$DEFAULT_XC_RELATIVE_PATH"
-    }
-
     @TaskAction
     def restore() {
         def slnFile = project.file(solutionFile)
@@ -41,10 +36,10 @@ class ComponentRestoreTask extends DefaultTask {
             return
         }
 
-        def cmdLine = resolvedXCPath.endsWith('.exe') ?  [paths.mono] : []
-        cmdLine += [resolvedXCPath, XC_RESTORE_COMMAND, slnFile]
+        def cmdLine = paths.xamarinComponent.endsWith('.exe') ?  [paths.mono] : []
+        cmdLine += [paths.xamarinComponent, XC_RESTORE_COMMAND, slnFile]
         project.exec {
-            workingDir project.file(resolvedXCPath).parent
+            workingDir project.file(paths.xamarinComponent).parent
             commandLine cmdLine
         }
 

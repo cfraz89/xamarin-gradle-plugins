@@ -8,6 +8,7 @@ import au.org.trogdor.xamarin.lib.MDToolProject
 import au.org.trogdor.xamarin.lib.NUnitProject
 import au.org.trogdor.xamarin.lib.PathContainer
 import au.org.trogdor.xamarin.lib.XBuildProject
+import au.org.trogdor.xamarin.lib.XUnitProject
 import au.org.trogdor.xamarin.lib.XamarinProject
 import au.org.trogdor.xamarin.lib.iOSAppProject
 import au.org.trogdor.xamarin.lib.iOSLibraryProject
@@ -25,7 +26,7 @@ class XamarinBuildExtension {
 
     XamarinBuildExtension(Project prj) {
         project = prj
-        mPaths = new PathContainer()
+        mPaths = new PathContainer(prj)
     }
 
     private def setProject(XamarinProject xprj, Closure closure) {
@@ -90,5 +91,9 @@ class XamarinBuildExtension {
 
     def nunitProject(Closure closure) {
         setProject(new NUnitProject(project), closure)
+    }
+
+    def xunitProject(Closure closure) {
+        setProject(new XUnitProject(project), closure)
     }
 }

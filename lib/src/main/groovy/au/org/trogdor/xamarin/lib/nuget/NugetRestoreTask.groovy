@@ -13,7 +13,6 @@ import org.gradle.api.tasks.TaskExecutionException
  * Created by chrisfraser on 3/06/2014.
  */
 class NugetRestoreTask extends DefaultTask {
-    static String DEFAULT_NUGET_RELATIVE_PATH = '.nuget/nuget.exe'
     static String NUGET_PACKAGES_DIR = 'packages'
     static String NUGET_RESTORE_COMMAND = 'restore'
 
@@ -29,10 +28,6 @@ class NugetRestoreTask extends DefaultTask {
         project.file(solutionFile).parent
     }
 
-    def getResolvedNugetPath() {
-        paths.nuget ?: "$solutionDir/$DEFAULT_NUGET_RELATIVE_PATH"
-    }
-
     @TaskAction
     def restore() {
         def slnFile = project.file(solutionFile)
@@ -41,8 +36,8 @@ class NugetRestoreTask extends DefaultTask {
             return
         }
 
-        def cmdLine = resolvedNugetPath.endsWith('.exe') ?  [paths.mono] : []
-        cmdLine += [resolvedNugetPath, NUGET_RESTORE_COMMAND, slnFile]
+        def cmdLine = paths.nuget.endsWith('.exe') ?  [paths.mono] : []
+        cmdLine += [paths.nuget, NUGET_RESTORE_COMMAND, slnFile]
         project.exec { commandLine cmdLine }
 
     }

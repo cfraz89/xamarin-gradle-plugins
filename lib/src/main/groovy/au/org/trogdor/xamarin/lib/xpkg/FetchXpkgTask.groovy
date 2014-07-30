@@ -10,29 +10,18 @@ import org.gradle.api.tasks.TaskAction
  * Created by chrisfraser on 3/06/2014.
  */
 class FetchXpkgTask extends DefaultTask {
-    static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component'
     static String XPKG_URL = 'https://components.xamarin.com/submit/xpkg'
-
-    String solutionFile
     PathContainer paths
 
-    def setSolution(String solution) {
-        solutionFile = solution
-        onlyIf { !project.file(resolvedXCPath).exists() }
-        outputs.file(resolvedXCPath)
-    }
-
-    def getSolutionDir() {
-        project.file(solutionFile).parent
-    }
-
-    def getResolvedXCPath() {
-        paths.xamarinComponent ?: "$solutionDir/$DEFAULT_XC_RELATIVE_PATH"
+    def setPaths(PathContainer paths) {
+        this.paths = paths
+        onlyIf { !project.file(paths.xamarinComponent).exists() }
+        outputs.file(paths.xamarinComponent)
     }
 
     @TaskAction
     def fetch() {
-        def xcFile = project.file(resolvedXCPath)
+        def xcFile = project.file(paths.xamarinComponent)
         def xpkgDir = xcFile.parentFile
         xpkgDir.mkdirs()
         def xpkgFile = project.file("$xpkgDir/xpkg.zip")
