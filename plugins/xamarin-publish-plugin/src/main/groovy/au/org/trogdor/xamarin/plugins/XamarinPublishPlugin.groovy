@@ -29,18 +29,10 @@ class XamarinPublishPlugin implements Plugin<Project> {
             private void addArtifacts(configuration, publication, projectInternal) {
                 def classifierName = configuration.name.toLowerCase()
                 configuration.resolvedBuildOutput.with {
-                    if (projectInternal.file(it).exists())
-                        publication.artifact(it) {
-                            extension "dll"
-                            classifier classifierName
-                        }
-
-                    def symbolsPath = "${it}.mdb"
-                    if (projectInternal.file(symbolsPath).exists())
-                        publication.artifact(symbolsPath) {
-                            extension "dll.mdb"
-                            classifier "$classifierName-symbols"
-                        }
+                    publication.artifact(it) {
+                        extension "dll"
+                        classifier classifierName
+                    }
                 }
             }
         })
