@@ -38,6 +38,5 @@ class NugetRestoreTask extends DefaultTask {
         def cmdLine = paths.nuget.endsWith('.exe') ?  [paths.mono] : []
         cmdLine += [paths.nuget, NUGET_RESTORE_COMMAND, slnFile]
         project.exec { commandLine cmdLine }
-
     }
 }
