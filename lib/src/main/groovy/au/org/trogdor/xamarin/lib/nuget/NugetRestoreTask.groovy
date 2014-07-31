@@ -35,7 +35,6 @@ class NugetRestoreTask extends DefaultTask {
             throw new ProjectConfigurationException("Solution file location $slnFile does not exist!", null)
             return
         }
-
         def cmdLine = paths.nuget.endsWith('.exe') ?  [paths.mono] : []
         cmdLine += [paths.nuget, NUGET_RESTORE_COMMAND, slnFile]
         project.exec { commandLine cmdLine }

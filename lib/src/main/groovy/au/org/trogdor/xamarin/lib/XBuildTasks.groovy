@@ -25,7 +25,6 @@ class XBuildTask extends DefaultTask {
                 return
             }
         }
-
         project.exec { commandLine generateCommand(config) }
     }
 }
