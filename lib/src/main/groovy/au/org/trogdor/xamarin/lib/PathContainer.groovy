@@ -7,7 +7,7 @@ import org.gradle.api.Project
  */
 class PathContainer {
     static String DEFAULT_NUGET_RELATIVE_PATH = '.nuget/nuget.exe'
-    static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component'
+    static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component.exe'
 
     Project project
 
