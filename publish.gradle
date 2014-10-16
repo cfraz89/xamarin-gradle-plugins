@@ -1,0 +1,13 @@
+subprojects {
+	if (name.contains('-plugin') || name.contains('lib')) {
+		afterEvaluate {
+			uploadArchives {
+				repositories {
+			        mavenDeployer {
+			            repository(url: "http://nexus.int.corp.sun/content/repositories/extFree")
+			        }
+			    }
+			}
+		}
+	}
+}

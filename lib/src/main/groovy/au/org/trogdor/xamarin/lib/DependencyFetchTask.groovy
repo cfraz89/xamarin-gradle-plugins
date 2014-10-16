@@ -14,8 +14,8 @@ class DependencyFetchTask extends DefaultTask {
 
     def setConfiguration(Configuration c) {
         mConfiguration = c
-        inputs.source(mConfiguration)
-        outputs.dir(xProj.dependencyDir)
+        //inputs.source(mConfiguration)
+        //outputs.dir(xProj.dependencyDir)
     }
 
     def setXamarinProject(XamarinProject xp) {

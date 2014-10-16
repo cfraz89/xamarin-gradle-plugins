@@ -2,4 +2,4 @@ allprojects {
 	group = 'au.org.trogdor.xamarin-gradle-plugins'
 }
 
-#apply from: 'publish.gradle'
+//apply from: 'publish.gradle'
