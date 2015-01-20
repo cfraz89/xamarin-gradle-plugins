@@ -119,7 +119,7 @@ class iOSAppConfiguration extends XamarinConfiguration {
             outputs.dir(resolvedIPhoneBuildOutput)
         }
 
-        def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
+        def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask])
         project.tasks.buildAll.dependsOn(buildTask)
         dependOnReferences(iPhoneSimulatorTask)
         dependOnReferences(iPhoneTask)
