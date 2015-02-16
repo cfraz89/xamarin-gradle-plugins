@@ -5,3 +5,7 @@ build/
 bin/
 obj/
 .userprefs
+
+# intellij
+*.iml
+.idea/
