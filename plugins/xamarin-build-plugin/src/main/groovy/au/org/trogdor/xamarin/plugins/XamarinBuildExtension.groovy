@@ -7,11 +7,16 @@ import au.org.trogdor.xamarin.lib.GenericLibraryProject
 import au.org.trogdor.xamarin.lib.MDToolProject
 import au.org.trogdor.xamarin.lib.NUnitProject
 import au.org.trogdor.xamarin.lib.PathContainer
+import au.org.trogdor.xamarin.lib.UnifiediOSAppConfiguration
+import au.org.trogdor.xamarin.lib.UnifiediOSAppProject
+import au.org.trogdor.xamarin.lib.UnifiediOSLibraryConfiguration
+import au.org.trogdor.xamarin.lib.UnifiediOSLibraryProject
 import au.org.trogdor.xamarin.lib.XBuildProject
 import au.org.trogdor.xamarin.lib.XUnitProject
 import au.org.trogdor.xamarin.lib.XamarinProject
 import au.org.trogdor.xamarin.lib.iOSAppProject
 import au.org.trogdor.xamarin.lib.iOSLibraryProject
+
 import org.gradle.api.Project
 
 /**
@@ -95,5 +100,13 @@ class XamarinBuildExtension {
 
     def xunitProject(Closure closure) {
         setProject(new XUnitProject(project), closure)
+    }
+
+    def unifiediOSAppProject(Closure closure) {
+        setProject(new UnifiediOSAppProject(project), closure)
+    }
+
+    def unifiediOSLibraryProject(Closure closure) {
+        setProject(new UnifiediOSLibraryProject(project), closure)
     }
 }
