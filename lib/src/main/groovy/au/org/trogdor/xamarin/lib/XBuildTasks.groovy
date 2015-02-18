@@ -48,6 +48,8 @@ class XBuildCleanTask extends XBuildTask {
         xamarinProject.configurationContainer.all() { config ->
             executeForConfiguration(config)
         }
+        println "Deleting build for real"
+        project.delete(project.fileTree (dir:xamarinProject.projectDir, includes: ['**/bin/**', '**/obj/**']))
         println "Deleting dependencies"
         project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
     }
