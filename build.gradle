@@ -3,4 +3,4 @@ allprojects {
     version = '0.2.7'
 }
 
-apply from: 'publish.gradle'
+//apply from: 'publish.gradle'
