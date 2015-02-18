@@ -189,3 +189,62 @@ class XUnitConfiguration extends XamarinSingleBuildConfiguration {
         }
     }
 }
+
+@InheritConstructors
+class UnifiediOSLibraryConfiguration extends XamarinSingleBuildConfiguration {
+}
+
+@InheritConstructors
+class UnifiediOSAppConfiguration extends XamarinConfiguration {
+    private String mIPhoneSimulatorOutput
+    private String mIPhoneOutput
+
+
+    def makeTasks() {
+        def iPhoneSimulatorTask = project.task("build${name}iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
+            xamarinProject = xPrj
+            configuration = this
+            inputs.dir(sourceFiles)
+            outputs.dir(resolvedIPhoneSimulatorBuildOutput)
+        }
+        def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
+            xamarinProject = xPrj
+            configuration = this
+            inputs.dir(sourceFiles)
+            outputs.dir(resolvedIPhoneBuildOutput)
+        }
+
+        def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])
+        project.tasks.buildAll.dependsOn(buildTask)
+        dependOnReferences(iPhoneSimulatorTask)
+        dependOnReferences(iPhoneTask)
+    }
+
+    protected def resolveBuildOutput(String overrideOutput, String device) {
+        overrideOutput ?: "${xPrj.projectDir}/bin/$device/$name/${xPrj.resolvedProjectName}.app"
+    }
+
+    def getResolvedIPhoneSimulatorBuildOutput() {
+        resolveBuildOutput(mIPhoneSimulatorOutput, 'iPhoneSimulator')
+    }
+
+    def setIPhoneSimulatorBuildOutput(String output) {
+        mIPhoneSimulatorOutput = output
+    }
+
+    def iPhoneSimulatorBuildOutput(String output) {
+        mIPhoneSimulatorOutput = output
+    }
+
+    def getResolvedIPhoneBuildOutput() {
+        resolveBuildOutput(mIPhoneOutput, 'iPhone')
+    }
+
+    def setIPhoneBuildOutput(String output) {
+        mIPhoneOutput = output
+    }
+
+    def iPhoneBuildOutput(String output) {
+        mIPhoneOutput = output
+    }
+}

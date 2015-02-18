@@ -5,7 +5,6 @@ import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.Project
 import groovy.transform.InheritConstructors
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.tasks.TaskExecutionException
 
 class XamarinProject implements NamedDomainObjectFactory<XamarinConfiguration>{
 	final Project project
@@ -187,5 +186,20 @@ class GenericAppProject extends XBuildProject {
 class NUnitProject extends XBuildProject {
     XamarinConfiguration create(String name) {
         return new NUnitConfiguration(name, project, this)
+    }
+}
+
+@InheritConstructors
+class UnifiediOSLibraryProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new UnifiediOSLibraryConfiguration(name, project, this)
+    }
+}
+
+
+@InheritConstructors
+class UnifiediOSAppProject extends XBuildProject {
+    XamarinConfiguration create(String name) {
+        return new UnifiediOSAppConfiguration(name, project, this)
     }
 }
