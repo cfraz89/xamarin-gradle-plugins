@@ -76,18 +76,12 @@ class XBuildiPhoneCompileTask extends XBuildTask {
     }
 }
 
-class XBuildiPhoneCleanTask extends XBuildTask {
-    @TaskAction
-    def executeTask() {
-        xamarinProject.configurationContainer.all() { config ->
-            executeForConfiguration(config)
-        }
-
-        println "Deleting dependencies"
-        project.delete(project.fileTree(dir:xamarinProject.dependencyDir, include: '*'))
-    }
-
+class XBuildiPhoneCleanTask extends XBuildCleanTask {
     def generateCommand(XamarinConfiguration config) {
-        [project.xamarin.paths.xbuild, xamarinProject.projectFile, "/p:Configuration=${config.name}${deviceTag}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Clean']
+        def a = [project.xamarin.paths.xbuild, xamarinProject.projectFile, "/p:Configuration=${config.name}", "/p:SolutionDir=${xamarinProject.solutionDir}", "/p:ProjectDir=${xamarinProject.projectDir}", '/t:Clean']
+        if(device) {
+            a.push("/p:Platform=${device}")
+        }
+        return a
     }
 }
