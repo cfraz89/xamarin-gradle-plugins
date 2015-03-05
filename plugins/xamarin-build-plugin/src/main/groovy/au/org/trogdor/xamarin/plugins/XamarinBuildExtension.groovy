@@ -1,24 +1,6 @@
 package au.org.trogdor.xamarin.plugins
-
-import au.org.trogdor.xamarin.lib.AndroidAppProject
-import au.org.trogdor.xamarin.lib.AndroidLibraryProject
-import au.org.trogdor.xamarin.lib.GenericAppProject
-import au.org.trogdor.xamarin.lib.GenericLibraryProject
-import au.org.trogdor.xamarin.lib.MDToolProject
-import au.org.trogdor.xamarin.lib.NUnitProject
-import au.org.trogdor.xamarin.lib.PathContainer
-import au.org.trogdor.xamarin.lib.UnifiediOSAppConfiguration
-import au.org.trogdor.xamarin.lib.UnifiediOSAppProject
-import au.org.trogdor.xamarin.lib.UnifiediOSLibraryConfiguration
-import au.org.trogdor.xamarin.lib.UnifiediOSLibraryProject
-import au.org.trogdor.xamarin.lib.XBuildProject
-import au.org.trogdor.xamarin.lib.XUnitProject
-import au.org.trogdor.xamarin.lib.XamarinProject
-import au.org.trogdor.xamarin.lib.iOSAppProject
-import au.org.trogdor.xamarin.lib.iOSLibraryProject
-
+import au.org.trogdor.xamarin.lib.*
 import org.gradle.api.Project
-
 /**
  * Created by chrisfraser on 7/07/2014.
  */

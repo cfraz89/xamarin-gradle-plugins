@@ -204,14 +204,18 @@ class UnifiediOSAppConfiguration extends XamarinConfiguration {
         def iPhoneSimulatorTask = project.task("build${name}iPhoneSimulator", description: "Build a Xamarin project using configuration ${name} for the iPhoneSimulator target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
+            device = "iPhoneSimulator"
             inputs.dir(sourceFiles)
             outputs.dir(resolvedIPhoneSimulatorBuildOutput)
+            outputPath = resolvedIPhoneBuildOutput
         }
         def iPhoneTask = project.task("build${name}iPhone", description: "Build a Xamarin project using configuration ${name} for the iPhone target", group: "Xamarin", dependsOn: "$RESTORE_TASK_NAME$name", type: xPrj.buildTask()) {
             xamarinProject = xPrj
             configuration = this
+            device = "iPhone"
             inputs.dir(sourceFiles)
             outputs.dir(resolvedIPhoneBuildOutput)
+            outputPath = resolvedIPhoneBuildOutput
         }
 
         def buildTask = project.task("build${name}", description: "Build a Xamarin project using configuration ${name}", group: "Xamarin", dependsOn: [iPhoneSimulatorTask, iPhoneTask])

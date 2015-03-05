@@ -125,6 +125,17 @@ class XBuildProject extends XamarinProject {
 }
 
 @InheritConstructors
+class XBuildiPhoneProject extends XBuildProject {
+    def buildTask() {
+        return XBuildiPhoneCompileTask
+    }
+
+    def cleanTask() {
+        return XBuildiPhoneCleanTask
+    }
+}
+
+@InheritConstructors
 class AndroidLibraryProject extends XBuildProject {
     XamarinConfiguration create(String name) {
         return new AndroidLibraryConfiguration(name, project, this)
@@ -196,9 +207,8 @@ class UnifiediOSLibraryProject extends XBuildProject {
     }
 }
 
-
 @InheritConstructors
-class UnifiediOSAppProject extends XBuildProject {
+class UnifiediOSAppProject extends XBuildiPhoneProject {
     XamarinConfiguration create(String name) {
         return new UnifiediOSAppConfiguration(name, project, this)
     }
