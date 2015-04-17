@@ -8,7 +8,6 @@ import org.gradle.api.tasks.TaskAction
  * Created by chrisfraser on 3/06/2014.
  */
 class FetchNugetTask extends DefaultTask {
-    static String NUGET_EXE_URL = 'http://nuget.org/nuget.exe'
     PathContainer paths
 
 
@@ -23,7 +22,7 @@ class FetchNugetTask extends DefaultTask {
         println 'No nuget in solution, downloading...'
         def nugetFile = project.file(paths.nuget)
         nugetFile.parentFile.mkdirs()
-        new URL(NUGET_EXE_URL).withInputStream { i ->
+        new URL(paths.nugetExeUrl).withInputStream { i ->
             nugetFile.withOutputStream { it << i }
         }
     }

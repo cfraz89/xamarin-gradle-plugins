@@ -8,6 +8,8 @@ import org.gradle.api.Project
 class PathContainer {
     static String DEFAULT_NUGET_RELATIVE_PATH = '.nuget/nuget.exe'
     static String DEFAULT_XC_RELATIVE_PATH = '.xpkg/xamarin-component.exe'
+    static String DEFAULT_XPKG_URL = 'https://components.xamarin.com/submit/xpkg'
+    static String DEFAULT_NUGET_EXE_URL = 'http://nuget.org/nuget.exe'
 
     Project project
 
@@ -18,6 +20,8 @@ class PathContainer {
     def xamarinComponent = "${->solutionPath}/${->DEFAULT_XC_RELATIVE_PATH}"
     def nunitConsole = 'nunit-console'
     def xunitConsole = 'xunit-console'
+    def xpkgExeUrl = DEFAULT_XPKG_URL
+    def nugetExeUrl = DEFAULT_NUGET_EXE_URL
 
     def PathContainer(Project project) {
         this.project = project
@@ -49,6 +53,14 @@ class PathContainer {
 
     def xunitConsole(def xunitConsolePath) {
         xunitConsole = xunitConsolePath
+    }
+
+    def xpkgExeUrl(def xpkgUrlPath) {
+        xpkgExeUrl = xpkgUrlPath
+    }
+
+    def nugetExeUrl(def nugetExeURLPath) {
+        nugetExeUrl = nugetExeURLPath
     }
 
     def getSolutionPath() {

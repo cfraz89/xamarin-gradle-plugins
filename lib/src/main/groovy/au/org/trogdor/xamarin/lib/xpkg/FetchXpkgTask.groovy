@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskAction
  * Created by chrisfraser on 3/06/2014.
  */
 class FetchXpkgTask extends DefaultTask {
-    static String XPKG_URL = 'https://components.xamarin.com/submit/xpkg'
     PathContainer paths
 
     def setPaths(PathContainer paths) {
@@ -26,7 +25,7 @@ class FetchXpkgTask extends DefaultTask {
         xpkgDir.mkdirs()
         def xpkgFile = project.file("$xpkgDir/xpkg.zip")
         println 'No xpkg in solution, downloading...'
-        new URL(XPKG_URL).withInputStream { i ->
+        new URL(paths.xpkgExeUrl).withInputStream { i ->
             xpkgFile.withOutputStream { it << i }
         }
         project.copy {
