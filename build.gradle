@@ -1,6 +1,6 @@
 allprojects {
 	group = 'au.org.trogdor.xamarin-gradle-plugins'
-    version = '0.2.9.3'
+    version = '0.2.9.4'
 }
 
 //apply from: 'publish.gradle'

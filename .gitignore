@@ -5,6 +5,7 @@ build/
 bin/
 obj/
 .userprefs
+local.properties
 
 # intellij
 *.iml

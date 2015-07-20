@@ -23,6 +23,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
     public static String TASK_RESTORE_COMPONENTS_NAME = "restoreXamarinComponents"
     public static String TASK_FETCH_NUGET_NAME = "fetchNuget"
     public static String TASK_FETCH_XPKG_NAME = "fetchXpkg"
+    public static String TASK_BUILD_NAME = "restore"
     public static String TASK_RESTORE_NAME = "restore"
     public static String TASK_TEST_NAME = "test"
     public static String TASK_GROUP = "Xamarin"
@@ -65,6 +66,7 @@ class XamarinBuildPlugin implements Plugin<Project> {
 
                     xamarin.xamarinProject.configurations.each {
                         setupConfiguration(project, it)
+                        setupTaskOrder(project, it)
                     }
                 }
             }
@@ -111,6 +113,17 @@ class XamarinBuildPlugin implements Plugin<Project> {
         project.xamarin.xamarinProject.solutionProject.with {
             project.evaluationDependsOn(it.path)
             project.task("$TASK_RESTORE_NAME$xConf.name", description: "Restore all project dependencies for $xConf.name", group: TASK_GROUP_DEPENDENCIES, dependsOn: [installDependencies, tasks.findByName(TASK_RESTORE_NUGET_NAME), tasks.findByName(TASK_RESTORE_COMPONENTS_NAME)])
+        }
+    }
+
+    def setupTaskOrder(Project project, XamarinConfiguration xConf) {
+        project.with {
+            def buildTask = tasks.findByName("$TASK_BUILD_NAME$xConf.name")
+            def restoreTask = tasks.findByName("$TASK_RESTORE_NAME$xConf.name")
+            def cleanTask = tasks.findByName("$TASK_CLEAN_NAME")
+
+            buildTask.mustRunAfter cleanTask
+            restoreTask.mustRunAfter cleanTask
         }
     }
 }
